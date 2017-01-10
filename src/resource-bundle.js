@@ -23,7 +23,10 @@
                 var country = locale.getCountry();
                 var variant = locale.getVariant();
                 var key;
-                bundle = global[ baseName ][ "" ];
+                bundle = {};
+                for ( key in global[ baseName ][ "" ] ) {
+                    bundle[ key ] = global[ baseName ][ "" ][ key ];
+                }
                 if ( language && language.length > 0 ) {
                     var code = language;
                     if ( global[ baseName ][ code ] ) {
