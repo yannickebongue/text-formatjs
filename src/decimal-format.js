@@ -14,6 +14,7 @@
     function DecimalFormat( pattern, symbols ) {
         global.NumberFormat.call( this );
         var _super = this;
+        var _this = this;
 
         var _PATTERN_ZERO_DIGIT         = "0";
         var _PATTERN_GROUPING_SEPARATOR = ",";
@@ -93,6 +94,156 @@
                 buffer += c;
             }
             return buffer;
+        };
+
+        var _appendAffixPattern = function( buffer, affixPattern, expAffix, localized ) {
+            if (affixPattern == null) {
+                _appendAffix(buffer, expAffix, localized);
+            } else {
+                var i;
+                for (var pos=0; pos<affixPattern.length; pos=i) {
+                    i = affixPattern.indexOf(_QUOTE, pos);
+                    if (i < 0) {
+                        _appendAffix(buffer, affixPattern.substring(pos), localized);
+                        break;
+                    }
+                    if (i > pos) {
+                        _appendAffix(buffer, affixPattern.substring(pos, i), localized);
+                    }
+                    var c = affixPattern.charAt(++i);
+                    ++i;
+                    if (c == _QUOTE) {
+                        buffer += c;
+                        // Fall through and append another QUOTE below
+                    } else if (c == _CURRENCY_SIGN &&
+                        i<affixPattern.length &&
+                        affixPattern.charAt(i) == _CURRENCY_SIGN) {
+                        ++i;
+                        buffer += c;
+                        // Fall through and append another CURRENCY_SIGN below
+                    } else if (localized) {
+                        switch (c) {
+                            case _PATTERN_PERCENT:
+                                c = symbols.getPercent();
+                                break;
+                            case _PATTERN_PER_MILLE:
+                                c = symbols.getPerMill();
+                                break;
+                            case _PATTERN_MINUS:
+                                c = symbols.getMinusSign();
+                                break;
+                        }
+                    }
+                    buffer += c;
+                }
+            }
+            return buffer;
+        };
+
+        var _appendAffix = function( buffer, affix, localized ) {
+            var needQuote;
+            if (localized) {
+                needQuote = affix.indexOf(symbols.getZeroDigit()) >= 0
+                    || affix.indexOf(symbols.getGroupingSeparator()) >= 0
+                    || affix.indexOf(symbols.getDecimalSeparator()) >= 0
+                    || affix.indexOf(symbols.getPercent()) >= 0
+                    || affix.indexOf(symbols.getPerMill()) >= 0
+                    || affix.indexOf(symbols.getDigit()) >= 0
+                    || affix.indexOf(symbols.getPatternSeparator()) >= 0
+                    || affix.indexOf(symbols.getMinusSign()) >= 0
+                    || affix.indexOf(_CURRENCY_SIGN) >= 0;
+            }
+            else {
+                needQuote = affix.indexOf(_PATTERN_ZERO_DIGIT) >= 0
+                    || affix.indexOf(_PATTERN_GROUPING_SEPARATOR) >= 0
+                    || affix.indexOf(_PATTERN_DECIMAL_SEPARATOR) >= 0
+                    || affix.indexOf(_PATTERN_PERCENT) >= 0
+                    || affix.indexOf(_PATTERN_PER_MILLE) >= 0
+                    || affix.indexOf(_PATTERN_DIGIT) >= 0
+                    || affix.indexOf(_PATTERN_SEPARATOR) >= 0
+                    || affix.indexOf(_PATTERN_MINUS) >= 0
+                    || affix.indexOf(_CURRENCY_SIGN) >= 0;
+            }
+            if (needQuote) {
+                buffer += "'";
+            }
+            if (affix.indexOf("'") < 0) {
+                buffer += affix;
+            } else {
+                for (var j=0; j<affix.length; ++j) {
+                    var c = affix.charAt(j);
+                    buffer += c;
+                    if (c == "'") {
+                        buffer += c;
+                    }
+                }
+            }
+            if (needQuote) {
+                buffer += "'";
+            }
+            return buffer;
+        };
+
+        var _toPattern = function( localized ) {
+            var result = "";
+            for (var j = 1; j >= 0; --j) {
+                if (j == 1) {
+                    result = _appendAffixPattern(result, _posPrefixPattern, _positivePrefix, localized);
+                } else {
+                    result = _appendAffixPattern(result, _negPrefixPattern, _negativePrefix, localized);
+                }
+                var i;
+                var digitCount = _useExponentialNotation
+                    ? _this.getMaximumIntegerDigits()
+                    : Math.max(_groupingSize, _this.getMinimumIntegerDigits())+1;
+                for (i = digitCount; i > 0; --i) {
+                    if (i != digitCount && _this.isGroupingUsed() && _groupingSize != 0 &&
+                        i % _groupingSize == 0) {
+                        result += (localized ? symbols.getGroupingSeparator() :
+                            _PATTERN_GROUPING_SEPARATOR);
+                    }
+                    result += (i <= _this.getMinimumIntegerDigits()
+                        ? (localized ? symbols.getZeroDigit() : _PATTERN_ZERO_DIGIT)
+                        : (localized ? symbols.getDigit() : _PATTERN_DIGIT));
+                }
+                if (_this.getMaximumFractionDigits() > 0 || _decimalSeparatorAlwaysShown)
+                    result += (localized ? symbols.getDecimalSeparator() :
+                        _PATTERN_DECIMAL_SEPARATOR);
+                for (i = 0; i < _this.getMaximumFractionDigits(); ++i) {
+                    if (i < _this.getMinimumFractionDigits()) {
+                        result += (localized ? symbols.getZeroDigit() :
+                            _PATTERN_ZERO_DIGIT);
+                    } else {
+                        result += (localized ? symbols.getDigit() :
+                            _PATTERN_DIGIT);
+                    }
+                }
+                if (_useExponentialNotation) {
+                    result += (localized ? symbols.getExponentSeparator() :
+                        _PATTERN_EXPONENT);
+                    for (i=0; i<_minExponentDigits; ++i)
+                        result += (localized ? symbols.getZeroDigit() :
+                            _PATTERN_ZERO_DIGIT);
+                }
+                if (j == 1) {
+                    result += _appendAffixPattern(result, _posSuffixPattern, _positiveSuffix, localized);
+                    if ((_negSuffixPattern == _posSuffixPattern && // n == p == null
+                        _negativeSuffix === _positiveSuffix)
+                        || (_negSuffixPattern != null &&
+                        _negSuffixPattern === _posSuffixPattern)) {
+                        if ((_negPrefixPattern != null && _posPrefixPattern != null &&
+                            _negPrefixPattern === ("'-" + _posPrefixPattern)) ||
+                            (_negPrefixPattern == _posPrefixPattern && // n == p == null
+                            _negativePrefix === (symbols.getMinusSign() + _positivePrefix)))
+                            break;
+                    }
+                    result += (localized ? symbols.getPatternSeparator() :
+                        _PATTERN_SEPARATOR);
+                } else {
+                    result += _appendAffixPattern(result, _negSuffixPattern, _negativeSuffix, localized);
+                }
+            }
+            return result.toString();
         };
 
         var _append = function( result, string ) {
@@ -403,18 +554,18 @@
                      */
                     var effectiveDecimalPos = decimalPos >= 0 ?
                         decimalPos : digitTotalCount;
-                    this.setMinimumIntegerDigits(effectiveDecimalPos - digitLeftCount);
-                    this.setMaximumIntegerDigits(_useExponentialNotation ?
-                        digitLeftCount + this.getMinimumIntegerDigits() :
+                    _this.setMinimumIntegerDigits(effectiveDecimalPos - digitLeftCount);
+                    _this.setMaximumIntegerDigits(_useExponentialNotation ?
+                        digitLeftCount + _this.getMinimumIntegerDigits() :
                         _MAXIMUM_INTEGER_DIGITS);
-                    this.setMaximumFractionDigits(decimalPos >= 0 ?
+                    _this.setMaximumFractionDigits(decimalPos >= 0 ?
                         (digitTotalCount - decimalPos) : 0);
-                    this.setMinimumFractionDigits(decimalPos >= 0 ?
+                    _this.setMinimumFractionDigits(decimalPos >= 0 ?
                         (digitLeftCount + zeroDigitCount - decimalPos) : 0);
-                    this.setGroupingUsed(groupingCount > 0);
+                    _this.setGroupingUsed(groupingCount > 0);
                     _groupingSize = (groupingCount > 0) ? groupingCount : 0;
                     _multiplier = multiplier;
-                    this.setDecimalSeparatorAlwaysShown(decimalPos == 0 ||
+                    _this.setDecimalSeparatorAlwaysShown(decimalPos == 0 ||
                         decimalPos == digitTotalCount);
                 } else {
                     _negPrefixPattern = prefix.toString();
@@ -425,10 +576,10 @@
 
             if (pattern.length == 0) {
                 _posPrefixPattern = _posSuffixPattern = "";
-                this.setMinimumIntegerDigits(0);
-                this.setMaximumIntegerDigits(_MAXIMUM_INTEGER_DIGITS);
-                this.setMinimumFractionDigits(0);
-                this.setMaximumFractionDigits(_MAXIMUM_FRACTION_DIGITS);
+                _this.setMinimumIntegerDigits(0);
+                _this.setMaximumIntegerDigits(_MAXIMUM_INTEGER_DIGITS);
+                _this.setMinimumFractionDigits(0);
+                _this.setMaximumFractionDigits(_MAXIMUM_FRACTION_DIGITS);
             }
 
             // If there was no negative pattern, or if the negative pattern is
@@ -459,7 +610,7 @@
                 _symbols = new global.DecimalFormatSymbols( locale );
             }
 
-            _applyPattern.call( this, pattern, false );
+            _applyPattern( pattern, false );
         };
 
         var _subformat = function( result, isNegative, isInteger,
@@ -678,7 +829,7 @@
                     // Output grouping separator if necessary.  Don't output a
                     // grouping separator if i==0 though; that's at the end of
                     // the integer part.
-                    if (this.isGroupingUsed() && i>0 && (_groupingSize != 0) &&
+                    if (_this.isGroupingUsed() && i>0 && (_groupingSize != 0) &&
                         (i % _groupingSize == 0)) {
                         // var gStart = result.length;
                         result += grouping;
@@ -760,12 +911,224 @@
             return result;
         };
 
+        var _subparse = function( text, parsePosition, positivePrefix, negativePrefix,
+            digits, isExponent, status) {
+            var position = parsePosition.index;
+            var oldStart = parsePosition.index;
+            var backup;
+            var gotPositive, gotNegative;
+
+            // check for positivePrefix; take longest
+            gotPositive = text.substr(position, positivePrefix.length)
+                    .search(positivePrefix) > -1;
+            gotNegative = text.substr(position, negativePrefix.length)
+                    .search(negativePrefix) > -1;
+
+            if (gotPositive && gotNegative) {
+                if (positivePrefix.length > negativePrefix.length) {
+                    gotNegative = false;
+                } else if (positivePrefix.length < negativePrefix.length) {
+                    gotPositive = false;
+                }
+            }
+
+            if (gotPositive) {
+                position += positivePrefix.length;
+            } else if (gotNegative) {
+                position += negativePrefix.length;
+            } else {
+                parsePosition.errorIndex = position;
+                return false;
+            }
+
+            // process digits or Inf, find decimal position
+            status[STATUS_INFINITE] = false;
+            if (!isExponent && text.substr(position, _symbols.getInfinity().length)
+                    .search(_symbols.getInfinity()) > -1) {
+                position += _symbols.getInfinity().length;
+                status[STATUS_INFINITE] = true;
+            } else {
+                // We now have a string of digits, possibly with grouping symbols,
+                // and decimal points.  We want to process these into a DigitList.
+                // We don't want to put a bunch of leading zeros into the DigitList
+                // though, so we keep track of the location of the decimal point,
+                // put only significant digits into the DigitList, and adjust the
+                // exponent as needed.
+
+                digits.decimalAt = digits.count = 0;
+                digits.digits = [];
+                var zero = _symbols.getZeroDigit();
+                var decimal = _isCurrencyFormat ?
+                    _symbols.getMonetaryDecimalSeparator() :
+                    _symbols.getDecimalSeparator();
+                var grouping = _symbols.getGroupingSeparator();
+                var exponentString = _symbols.getExponentSeparator();
+                var sawDecimal = false;
+                var sawExponent = false;
+                var sawDigit = false;
+                var exponent = 0; // Set to the exponent value, if any
+
+                // We have to track digitCount ourselves, because digits.count will
+                // pin when the maximum allowable digits is reached.
+                var digitCount = 0;
+
+                backup = -1;
+                for (; position < text.length; ++position) {
+                    var ch = text.charAt(position);
+
+                    /* We recognize all digit ranges, not only the Latin digit range
+                     * '0'..'9'.  We do so by using the Character.digit() method,
+                     * which converts a valid Unicode digit to the range 0..9.
+                     *
+                     * The character 'ch' may be a digit.  If so, place its value
+                     * from 0 to 9 in 'digit'.  First try using the locale digit,
+                     * which may or MAY NOT be a standard Unicode digit range.  If
+                     * this fails, try using the standard Unicode digit ranges by
+                     * calling Character.digit().  If this also fails, digit will
+                     * have a value outside the range 0..9.
+                     */
+                    var digit = ch - zero;
+                    if (digit < 0 || digit > 9) {
+                        digit = parseInt(ch, 10);
+                    }
+
+                    if (digit == 0) {
+                        // Cancel out backup setting (see grouping handler below)
+                        backup = -1; // Do this BEFORE continue statement below!!!
+                        sawDigit = true;
+
+                        // Handle leading zeros
+                        if (digits.count == 0) {
+                            // Ignore leading zeros in integer part of number.
+                            if (!sawDecimal) {
+                                continue;
+                            }
+
+                            // If we have seen the decimal, but no significant
+                            // digits yet, then we account for leading zeros by
+                            // decrementing the digits.decimalAt into negative
+                            // values.
+                            --digits.decimalAt;
+                        } else {
+                            ++digitCount;
+                            digits.append(digit.toString());
+                        }
+                    } else if (digit > 0 && digit <= 9) { // [sic] digit==0 handled above
+                        sawDigit = true;
+                        ++digitCount;
+                        digits.append(digit.toString());
+
+                        // Cancel out backup setting (see grouping handler below)
+                        backup = -1;
+                    } else if (!isExponent && ch == decimal) {
+                        // If we're only parsing integers, or if we ALREADY saw the
+                        // decimal, then don't parse this one.
+                        if (_this.isParseIntegerOnly() || sawDecimal) {
+                            break;
+                        }
+                        digits.decimalAt = digitCount; // Not digits.count!
+                        sawDecimal = true;
+                    } else if (!isExponent && ch == grouping && _this.isGroupingUsed()) {
+                        if (sawDecimal) {
+                            break;
+                        }
+                        // Ignore grouping characters, if we are using them, but
+                        // require that they be followed by a digit.  Otherwise
+                        // we backup and reprocess them.
+                        backup = position;
+                    } else if (!isExponent && text.substr(position, exponentString.length).search(exponentString) > -1
+                        && !sawExponent) {
+                        // Process the exponent by recursively calling this method.
+                        var pos = new ParsePosition(position + exponentString.length);
+                        var stat = [false, false];
+                        var exponentDigits = new DigitList();
+
+                        if (_subparse(text, pos, "", symbols.getMinusSign(), exponentDigits, true, stat) &&
+                            exponentDigits.fitsIntoLong(stat[STATUS_POSITIVE], true)) {
+                            position = pos.index; // Advance past the exponent
+                            exponent = exponentDigits.getLong();
+                            if (!stat[STATUS_POSITIVE]) {
+                                exponent = -exponent;
+                            }
+                            sawExponent = true;
+                        }
+                        break; // Whether we fail or succeed, we exit this loop
+                    }
+                    else {
+                        break;
+                    }
+                }
+
+                if (backup != -1) {
+                    position = backup;
+                }
+
+                // If there was no decimal point we have an integer
+                if (!sawDecimal) {
+                    digits.decimalAt = digitCount; // Not digits.count!
+                }
+
+                // Adjust for exponent, if any
+                digits.decimalAt += exponent;
+
+                // If none of the text string was recognized.  For example, parse
+                // "x" with pattern "#0.00" (return index and error index both 0)
+                // parse "$" with pattern "$#0.00". (return index 0 and error
+                // index 1).
+                if (!sawDigit && digitCount == 0) {
+                    parsePosition.index = oldStart;
+                    parsePosition.errorIndex = oldStart;
+                    return false;
+                }
+            }
+
+            // check for suffix
+            if (!isExponent) {
+                if (gotPositive) {
+                    gotPositive = text.substr(position, _positiveSuffix.length)
+                            .search(_positiveSuffix) > -1;
+                }
+                if (gotNegative) {
+                    gotNegative = text.substr(position, _negativeSuffix.length)
+                            .search(_negativeSuffix) > -1;
+                }
+
+                // if both match, take longest
+                if (gotPositive && gotNegative) {
+                    if (_positiveSuffix.length > _negativeSuffix.length) {
+                        gotNegative = false;
+                    } else if (_positiveSuffix.length < _negativeSuffix.length) {
+                        gotPositive = false;
+                    }
+                }
+
+                // fail if neither or both
+                if (gotPositive == gotNegative) {
+                    parsePosition.errorIndex = position;
+                    return false;
+                }
+
+                parsePosition.index = position +
+                    (gotPositive ? _positiveSuffix.length : _negativeSuffix.length); // mark success!
+            } else {
+                parsePosition.index = position;
+            }
+
+            status[STATUS_POSITIVE] = gotPositive;
+            if (parsePosition.index == oldStart) {
+                parsePosition.errorIndex = position;
+                return false;
+            }
+            return true;
+        };
+
         this.getDecimalFormatSymbols = function() {
             return _symbols;
         };
 
         this.setDecimalFormatSymbols = function( decimalFormatSymbols ) {
             _symbols = decimalFormatSymbols;
+            _expandAffixes();
         };
 
         this.getMultiplier = function() {
@@ -790,6 +1153,19 @@
 
         this.setDecimalSeparatorAlwaysShown = function( decimalSeparatorAlwaysShown ) {
             _decimalSeparatorAlwaysShown = decimalSeparatorAlwaysShown;
+        };
+
+        this.getCurrency = function() {
+            return _symbols.getCurrency();
+        };
+
+        this.setCurrency = function( currency ) {
+            if ( currency ) {
+                _symbols.setCurrency( currency );
+                if ( _isCurrencyFormat ) {
+                    _expandAffixes();
+                }
+            }
         };
 
         this.format = function( number ) {
@@ -846,23 +1222,122 @@
             _digitList.set(isNegative, number.toString(),
                 _useExponentialNotation ? maxIntDigits + maxFraDigits : maxFraDigits,
                 !_useExponentialNotation);
-            return _subformat.apply(this, [result, isNegative, false,
-                maxIntDigits, minIntDigits, maxFraDigits, minFraDigits]);
+            return _subformat(result, isNegative, false,
+                maxIntDigits, minIntDigits, maxFraDigits, minFraDigits);
 
         };
 
-        this.parse = function( source ) {};
+        this.parse = function( text ) {
+            var pos = new global.ParsePosition(0);
+            // special case NaN
+            if (text.substr(pos.index, _symbols.getNaN().length).search(_symbols.getNaN()) > -1) {
+                pos.index = pos.index + _symbols.getNaN().length;
+                return Number.NaN;
+            }
+
+            var status = [ false, false ];
+            if (!_subparse(text, pos, _positivePrefix, _negativePrefix, _digitList, false, status)) {
+                return null;
+            }
+
+            // special case INFINITY
+            if (status[STATUS_INFINITE]) {
+                if (status[STATUS_POSITIVE] == (_multiplier >= 0)) {
+                    return Number.POSITIVE_INFINITY;
+                } else {
+                    return Number.NEGATIVE_INFINITY;
+                }
+            }
+
+            if (_multiplier == 0) {
+                if (_digitList.isZero()) {
+                    return Number.NaN;
+                } else if (status[STATUS_POSITIVE]) {
+                    return Number.POSITIVE_INFINITY;
+                } else {
+                    return Number.NEGATIVE_INFINITY;
+                }
+            }
+
+            var gotDouble = true;
+            var gotLongMinimum = false;
+            var  doubleResult = 0.0;
+            var    longResult = 0;
+
+            // Finally, have DigitList parse the digits into a value.
+            if (_digitList.fitsIntoLong(status[STATUS_POSITIVE], _this.isParseIntegerOnly())) {
+                gotDouble = false;
+                longResult = _digitList.getLong();
+                if (longResult < 0) {  // got Long.MIN_VALUE
+                    gotLongMinimum = true;
+                }
+            } else {
+                doubleResult = _digitList.getDouble();
+            }
+
+            // Divide by multiplier. We have to be careful here not to do
+            // unneeded conversions between double and long.
+            if (_multiplier != 1) {
+                if (gotDouble) {
+                    doubleResult /= _multiplier;
+                } else {
+                    // Avoid converting to double if we can
+                    if (longResult % _multiplier == 0) {
+                        longResult /= _multiplier;
+                    } else {
+                        doubleResult = longResult / _multiplier;
+                        gotDouble = true;
+                    }
+                }
+            }
+
+            if (!status[STATUS_POSITIVE] && !gotLongMinimum) {
+                doubleResult = -doubleResult;
+                longResult = -longResult;
+            }
+
+            // At this point, if we divided the result by the multiplier, the
+            // result may fit into a long.  We check for this case and return
+            // a long if possible.
+            // We must do this AFTER applying the negative (if appropriate)
+            // in order to handle the case of LONG_MIN; otherwise, if we do
+            // this with a positive value -LONG_MIN, the double is > 0, but
+            // the long is < 0. We also must retain a double in the case of
+            // -0.0, which will compare as == to a long 0 cast to a double
+            // (bug 4162852).
+            if (_multiplier != 1 && gotDouble) {
+                longResult = parseInt(doubleResult, 10);
+                gotDouble = ((doubleResult != longResult) ||
+                (doubleResult == 0.0 && 1/doubleResult < 0.0)) &&
+                !_this.isParseIntegerOnly();
+            }
+
+            return gotDouble ?
+                doubleResult : longResult;
+        };
+
+        this.toPattern = function() {
+            return _toPattern( false );
+        };
+
+        this.toLocalizedPattern = function() {
+            return _toPattern( true );
+        };
 
         this.applyPattern = function( pattern ) {
-            _applyPattern.call( this, pattern, false );
+            _applyPattern( pattern, false );
         };
 
         this.applyLocalizedPattern = function( pattern ) {
-            _applyPattern.call( this, pattern, true );
+            _applyPattern( pattern, true );
         };
 
-        _init.call( this, pattern, symbols );
+        _init( pattern, symbols );
     }
+
+    var STATUS_INFINITE = 0;
+    var STATUS_POSITIVE = 1;
+    var STATUS_LENGTH   = 2;
 
     DecimalFormat.prototype = Object.create( global.NumberFormat.prototype );
 
