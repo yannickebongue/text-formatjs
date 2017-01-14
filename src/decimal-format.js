@@ -1332,6 +1332,31 @@
             _applyPattern( pattern, true );
         };
 
+        this.adjustForCurrencyDefaultFractionDigits = function() {
+            var currency = _symbols.getCurrency();
+            if ( currency == null ) {
+                try {
+                    currency = Currency.getInstance( _symbols.getInternationalCurrencySymbol() );
+                } catch ( e ) {
+                }
+            }
+            if ( currency != null ) {
+                var digits = currency.getDefaultFractionDigits();
+                if ( digits != -1 ) {
+                    var oldMinDigits = this.getMinimumFractionDigits();
+                    // Common patterns are "#.##", "#.00", "#".
+                    // Try to adjust all of them in a reasonable way.
+                    if ( oldMinDigits == this.getMaximumFractionDigits() ) {
+                        this.setMinimumFractionDigits( digits );
+                        this.setMaximumFractionDigits( digits );
+                    } else {
+                        this.setMinimumFractionDigits( Math.min( digits, oldMinDigits ) );
+                        this.setMaximumFractionDigits( digits );
+                    }
+                }
+            }
+        };
+
         _init( pattern, symbols );
     }
 

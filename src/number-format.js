@@ -1,7 +1,10 @@
 ( function( global, factory ) {
 
     if ( typeof module === "object" && typeof module.exports === "object" ) {
+        module.require( "./resource-bundle" );
         module.require( "./format" );
+        module.require( "./decimal-format-symbols" );
+        module.require( "./decimal-format" );
         module.exports = factory( global );
     } else {
         factory( global );
@@ -73,8 +76,54 @@
 
     }
 
+    // Constants used by factory methods to specify a style of format.
+    var _NUMBERSTYLE = 0;
+    var _CURRENCYSTYLE = 1;
+    var _PERCENTSTYLE = 2;
+    var _SCIENTIFICSTYLE = 3;
+    var _INTEGERSTYLE = 4;
+
+    var _getInstance = function( desiredLocale, choice ) {
+        var resource = global.ResourceBundle.getBundle( "FormatData", desiredLocale );
+        var numberPatterns = resource[ "NumberPatterns" ];
+
+        var symbols = new global.DecimalFormatSymbols( desiredLocale );
+        var entry = ( choice == _INTEGERSTYLE ) ? _NUMBERSTYLE : choice;
+        var format = new global.DecimalFormat( numberPatterns[ entry ], symbols );
+
+        if ( choice == _INTEGERSTYLE ) {
+            format.setMaximumFractionDigits( 0 );
+            format.setDecimalSeparatorAlwaysShown( false );
+            format.setParseIntegerOnly( true );
+        } else if ( choice == _CURRENCYSTYLE ) {
+            format.adjustForCurrencyDefaultFractionDigits();
+        }
+
+        return format;
+    };
+
     NumberFormat.INTEGER_FIELD = 0;
     NumberFormat.FRACTION_FIELD = 1;
+
+    NumberFormat.getInstance = function( inLocale ) {
+        return _getInstance( inLocale || global.Locale.getDefault(), _NUMBERSTYLE );
+    };
+
+    NumberFormat.getNumberInstance = function( inLocale ) {
+        return _getInstance( inLocale || global.Locale.getDefault(), _NUMBERSTYLE );
+    };
+
+    NumberFormat.getIntegerInstance = function( inLocale ) {
+        return _getInstance( inLocale || global.Locale.getDefault(), _INTEGERSTYLE );
+    };
+
+    NumberFormat.getCurrencyInstance = function( inLocale ) {
+        return _getInstance( inLocale || global.Locale.getDefault(), _CURRENCYSTYLE );
+    };
+
+    NumberFormat.getPercentInstance = function( inLocale ) {
+        return _getInstance( inLocale || global.Locale.getDefault(), _PERCENTSTYLE );
+    };
 
     NumberFormat.prototype = Object.create( global.Format.prototype );
 
