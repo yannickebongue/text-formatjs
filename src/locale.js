@@ -150,7 +150,7 @@
     Locale.prototype.getDisplayName = function() {
         var result = this.getDisplayLanguage();
         if ( this.getDisplayCountry() ) {
-            result += "(" + this.getDisplayCountry() + ")";
+            result += " (" + this.getDisplayCountry() + ")";
         }
         return result;
     };
