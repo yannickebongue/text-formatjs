@@ -47,28 +47,28 @@
         global.Format.Field.call( this, name );
     };
 
-    DateFormat.Field.ERA = new Field( "era" );
-    DateFormat.Field.YEAR = new Field( "year" );
-    DateFormat.Field.MONTH = new Field( "month" );
-    DateFormat.Field.DAY_OF_MONTH = new Field( "day of month" );
-    DateFormat.Field.HOUR_OF_DAY1 = new Field( "hour of day 1" );
-    DateFormat.Field.HOUR_OF_DAY0 = new Field( "hour of day" );
-    DateFormat.Field.MINUTE = new Field( "minute" );
-    DateFormat.Field.SECOND = new Field( "second" );
-    DateFormat.Field.MILLISECOND = new Field( "millisecond" );
-    DateFormat.Field.DAY_OF_WEEK = new Field( "day of week" );
-    DateFormat.Field.DAY_OF_YEAR = new Field( "day of year" );
-    DateFormat.Field.DAY_OF_WEEK_IN_MONTH = new Field( "day of week in month" );
-    DateFormat.Field.WEEK_OF_YEAR = new Field( "week of year" );
-    DateFormat.Field.WEEK_OF_MONTH = new Field( "week of month" );
-    DateFormat.Field.AM_PM = new Field( "am pm" );
-    DateFormat.Field.HOUR1 = new Field( "hour 1" );
-    DateFormat.Field.HOUR0 = new Field( "hour" );
-    DateFormat.Field.TIME_ZONE = new Field( "time zone" );
+    DateFormat.Field.ERA = new DateFormat.Field( "era" );
+    DateFormat.Field.YEAR = new DateFormat.Field( "year" );
+    DateFormat.Field.MONTH = new DateFormat.Field( "month" );
+    DateFormat.Field.DAY_OF_MONTH = new DateFormat.Field( "day of month" );
+    DateFormat.Field.HOUR_OF_DAY1 = new DateFormat.Field( "hour of day 1" );
+    DateFormat.Field.HOUR_OF_DAY0 = new DateFormat.Field( "hour of day" );
+    DateFormat.Field.MINUTE = new DateFormat.Field( "minute" );
+    DateFormat.Field.SECOND = new DateFormat.Field( "second" );
+    DateFormat.Field.MILLISECOND = new DateFormat.Field( "millisecond" );
+    DateFormat.Field.DAY_OF_WEEK = new DateFormat.Field( "day of week" );
+    DateFormat.Field.DAY_OF_YEAR = new DateFormat.Field( "day of year" );
+    DateFormat.Field.DAY_OF_WEEK_IN_MONTH = new DateFormat.Field( "day of week in month" );
+    DateFormat.Field.WEEK_OF_YEAR = new DateFormat.Field( "week of year" );
+    DateFormat.Field.WEEK_OF_MONTH = new DateFormat.Field( "week of month" );
+    DateFormat.Field.AM_PM = new DateFormat.Field( "am pm" );
+    DateFormat.Field.HOUR1 = new DateFormat.Field( "hour 1" );
+    DateFormat.Field.HOUR0 = new DateFormat.Field( "hour" );
+    DateFormat.Field.TIME_ZONE = new DateFormat.Field( "time zone" );
 
     DateFormat.Field.prototype = Object.create( global.Format.Field.prototype );
 
-    DateFormat.Field.prototype.constructor = Field;
+    DateFormat.Field.prototype.constructor = DateFormat.Field;
 
     global.DateFormat = DateFormat;
 
