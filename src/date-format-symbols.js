@@ -71,11 +71,19 @@
             _weekdays = newWeekdays.slice();
         };
 
-        this.getAmpms = function() {
+        this.getShortWeekdays = function() {
+            return _shortWeekdays.slice();
+        };
+
+        this.setShortWeekdays = function( newShortWeekdays ) {
+            _shortWeekdays = newShortWeekdays.slice();
+        };
+
+        this.getAmPmStrings = function() {
             return _ampms.slice();
         };
 
-        this.setAmpms = function( newAmpms ) {
+        this.setAmPmStrings = function( newAmpms ) {
             _ampms = newAmpms.slice();
         };
 
