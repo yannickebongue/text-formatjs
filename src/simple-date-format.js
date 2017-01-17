@@ -419,8 +419,459 @@
             return buffer;
         };
 
+        var _matchString = function( text, start, field, data, date ) {
+            var i = 0;
+            var count = data.length;
+
+            if (field == 7) i = 1;
+
+            // There may be multiple strings in the data[] array which begin with
+            // the same prefix (e.g., Cerven and Cervenec (June and July) in Czech).
+            // We keep track of the longest match, and return that.  Note that this
+            // unfortunately requires us to test all array elements.
+            var bestMatchLength = 0, bestMatch = -1;
+            for (; i<count; ++i)
+            {
+                var length = data[i].length;
+                // Always compare if we have no match yet; otherwise only compare
+                // against potentially better matches (longer strings).
+                if (length > bestMatchLength &&
+                    text.substr(start, length).search(new RegExp(data[i], "i")) > -1)
+                {
+                    bestMatch = i;
+                    bestMatchLength = length;
+                }
+            }
+            if (bestMatch >= 0)
+            {
+                global.CalendarHelper.setField(date, field, bestMatch);
+                return start + bestMatchLength;
+            }
+            return -start;
+        };
+
+        var _subParseNumericZone = function( text, start, sign, count, colon ) {
+            var index = start;
+            parse:
+            try {
+                var c = text.charAt(index++);
+                // Parse hh
+                var hours;
+                if (!_isDigit(c)) {
+                    break parse;
+                }
+                hours = parseInt(c, 10);
+                c = text.charAt(index++);
+                if (_isDigit(c)) {
+                    hours = hours * 10 + parseInt(c, 10);
+                } else {
+                    // If no colon in RFC 822 or 'X' (ISO), two digits are
+                    // required.
+                    if (count > 0 || !colon) {
+                        break parse;
+                    }
+                    --index;
+                }
+                if (hours > 23) {
+                    break parse;
+                }
+                var minutes = 0;
+                if (count != 1) {
+                    // Proceed with parsing mm
+                    c = text.charAt(index++);
+                    if (colon) {
+                        if (c != ':') {
+                            break parse;
+                        }
+                        c = text.charAt(index++);
+                    }
+                    if (!_isDigit(c)) {
+                        break parse;
+                    }
+                    minutes = parseInt(c, 10);
+                    c = text.charAt(index++);
+                    if (!_isDigit(c)) {
+                        break parse;
+                    }
+                    minutes = minutes * 10 + parseInt(c, 10);
+                    if (minutes > 59) {
+                        break parse;
+                    }
+                }
+                /*minutes += hours * 60;
+                calb.set(Calendar.ZONE_OFFSET, minutes * MILLIS_PER_MINUTE * sign)
+                    .set(Calendar.DST_OFFSET, 0);*/
+                return index;
+            } catch ( e ) {}
+            return 1 - index;
+        };
+
         var _isDigit = function( c ) {
             return c >= '0' && c <= '9';
+        };
+
+        var _subParse = function( text, start, patternCharIndex, count,
+            obeyCount, ambiguousYear, origPos, useFollowingMinusSignAsDelimiter, date) {
+            var number = null;
+            var value = 0;
+            var pos = new global.ParsePosition(0);
+            pos.index = start;
+            if (patternCharIndex == global.DateFormatSymbols.PATTERN_WEEK_YEAR) {
+                // use calendar year 'y' instead
+                patternCharIndex = global.DateFormatSymbols.PATTERN_YEAR;
+            }
+            var field = _PATTERN_INDEX_TO_CALENDAR_FIELD[patternCharIndex];
+
+            // If there are any spaces here, skip over them.  If we hit the end
+            // of the string, then fail.
+            for (;;) {
+                if (pos.index >= text.length) {
+                    origPos.errorIndex = start;
+                    return -1;
+                }
+                var c = text.charAt(pos.index);
+                if (c != ' ' && c != '\t') break;
+                ++pos.index;
+            }
+
+            parsing:
+            {
+                // We handle a few special cases here where we need to parse
+                // a number value.  We handle further, more generic cases below.  We need
+                // to handle some of them here because some fields require extra processing on
+                // the parsed value.
+                if (patternCharIndex == global.DateFormatSymbols.PATTERN_HOUR_OF_DAY1 ||
+                    patternCharIndex == global.DateFormatSymbols.PATTERN_HOUR1 ||
+                    (patternCharIndex == global.DateFormatSymbols.PATTERN_MONTH && count <= 2) ||
+                    patternCharIndex == global.DateFormatSymbols.PATTERN_YEAR ||
+                    patternCharIndex == global.DateFormatSymbols.PATTERN_WEEK_YEAR) {
+                    // It would be good to unify this with the obeyCount logic below,
+                    // but that's going to be difficult.
+                    if (obeyCount) {
+                        if ((start+count) > text.length) {
+                            break parsing;
+                        }
+                        number = _numberFormat.parse(text.substring(0, start+count), pos);
+                    } else {
+                        number = _numberFormat.parse(text, pos);
+                    }
+                    if (number == null) {
+                        if (patternCharIndex != global.DateFormatSymbols.PATTERN_YEAR) {
+                            break parsing;
+                        }
+                    } else {
+                        value = parseInt(number, 10);
+
+                        if (useFollowingMinusSignAsDelimiter && (value < 0) &&
+                            (((pos.index < text.length) &&
+                            (text.charAt(pos.index) != _minusSign)) ||
+                            ((pos.index == text.length) &&
+                            (text.charAt(pos.index-1) == _minusSign)))) {
+                            value = -value;
+                            pos.index--;
+                        }
+                    }
+                }
+
+                var useDateFormatSymbols = true;
+
+                var index;
+                switch (patternCharIndex) {
+                    case global.DateFormatSymbols.PATTERN_ERA: // 'G'
+                        if (useDateFormatSymbols) {
+                            if ((index = _matchString(text, start, 0, _formatData.getEras(), date)) > 0) {
+                                return index;
+                            }
+                        } else {
+                            /*Map<String, Integer> map = calendar.getDisplayNames(field,
+                                Calendar.ALL_STYLES,
+                                locale);
+                            if ((index = matchString(text, start, field, map, calb)) > 0) {
+                                return index;
+                            }*/
+                        }
+                        break parsing;
+
+                    case global.DateFormatSymbols.PATTERN_WEEK_YEAR: // 'Y'
+                    case global.DateFormatSymbols.PATTERN_YEAR:      // 'y'
+                        /*if (!(calendar instanceof GregorianCalendar)) {
+                            // calendar might have text representations for year values,
+                            // such as "\u5143" in JapaneseImperialCalendar.
+                            int style = (count >= 4) ? Calendar.LONG : Calendar.SHORT;
+                            Map<String, Integer> map = calendar.getDisplayNames(field, style, locale);
+                            if (map != null) {
+                                if ((index = matchString(text, start, field, map, calb)) > 0) {
+                                    return index;
+                                }
+                            }
+                            calb.set(field, value);
+                            return pos.index;
+                        }*/
+
+                        // If there are 3 or more YEAR pattern characters, this indicates
+                        // that the year value is to be treated literally, without any
+                        // two-digit year adjustments (e.g., from "01" to 2001).  Otherwise
+                        // we made adjustments to place the 2-digit year in the proper
+                        // century, for parsed strings from "00" to "99".  Any other string
+                        // is treated literally:  "2250", "-1", "1", "002".
+                        if (count <= 2 && (pos.index - start) == 2
+                            && _isDigit(text.charAt(start))
+                            && _isDigit(text.charAt(start+1))) {
+                            // Assume for example that the defaultCenturyStart is 6/18/1903.
+                            // This means that two-digit years will be forced into the range
+                            // 6/18/1903 to 6/17/2003.  As a result, years 00, 01, and 02
+                            // correspond to 2000, 2001, and 2002.  Years 04, 05, etc. correspond
+                            // to 1904, 1905, etc.  If the year is 03, then it is 2003 if the
+                            // other fields specify a date before 6/18, or 1903 if they specify a
+                            // date afterwards.  As a result, 03 is an ambiguous year.  All other
+                            // two-digit years are unambiguous.
+                            var ambiguousTwoDigitYear = _defaultCenturyStartYear % 100;
+                            ambiguousYear[0] = value == ambiguousTwoDigitYear;
+                            value += (Math.floor(_defaultCenturyStartYear/100))*100 +
+                                (value < ambiguousTwoDigitYear ? 100 : 0);
+                        }
+                        date.setFullYear(value);
+                        return pos.index;
+
+                    case global.DateFormatSymbols.PATTERN_MONTH: // 'M'
+                        if (count <= 2) // i.e., M or MM.
+                        {
+                            // Don't want to parse the month if it is a string
+                            // while pattern uses numeric style: M or MM.
+                            // [We computed 'value' above.]
+                            global.CalendarHelper.setField(date, 2, value - 1);
+                            return pos.index;
+                        }
+
+                        if (useDateFormatSymbols) {
+                            // count >= 3 // i.e., MMM or MMMM
+                            // Want to be able to parse both short and long forms.
+                            // Try count == 4 first:
+                            var newStart = 0;
+                            if ((newStart = _matchString(text, start, 2,
+                                    _formatData.getMonths(), date)) > 0) {
+                                return newStart;
+                            }
+                            // count == 4 failed, now try count == 3
+                            if ((index = _matchString(text, start, 2,
+                                    _formatData.getShortMonths(), date)) > 0) {
+                                return index;
+                            }
+                        } else {
+                            /*Map<String, Integer> map = calendar.getDisplayNames(field,
+                                Calendar.ALL_STYLES,
+                                locale);
+                            if ((index = matchString(text, start, field, map, calb)) > 0) {
+                                return index;
+                            }*/
+                        }
+                        break parsing;
+
+                    case global.DateFormatSymbols.PATTERN_HOUR_OF_DAY1: // 'k' 1-based.  eg, 23:59 + 1 hour =>> 24:59
+                        /*if (!isLenient()) {
+                            // Validate the hour value in non-lenient
+                            if (value < 1 || value > 24) {
+                                break parsing;
+                            }
+                        }*/
+                        // [We computed 'value' above.]
+                        if (value == 24)
+                            value = 0;
+                        global.CalendarHelper.setField(date, 11, value);
+                        return pos.index;
+
+                    case global.DateFormatSymbols.PATTERN_DAY_OF_WEEK:  // 'E'
+                    {
+                        if (useDateFormatSymbols) {
+                            // Want to be able to parse both short and long forms.
+                            // Try count == 4 (DDDD) first:
+                            var newStart = 0;
+                            if ((newStart=_matchString(text, start, 7,
+                                    _formatData.getWeekdays(), date)) > 0) {
+                                return newStart;
+                            }
+                            // DDDD failed, now try DDD
+                            if ((index = _matchString(text, start, 7,
+                                    _formatData.getShortWeekdays(), date)) > 0) {
+                                return index;
+                            }
+                        } else {
+                            /*int[] styles = { Calendar.LONG, Calendar.SHORT };
+                            for (int style : styles) {
+                                Map<String,Integer> map = calendar.getDisplayNames(field, style, locale);
+                                if ((index = matchString(text, start, field, map, calb)) > 0) {
+                                    return index;
+                                }
+                            }*/
+                        }
+                    }
+                        break parsing;
+
+                    case global.DateFormatSymbols.PATTERN_AM_PM:    // 'a'
+                        if (useDateFormatSymbols) {
+                            if ((index = _matchString(text, start, 9,
+                                    _formatData.getAmPmStrings(), date)) > 0) {
+                                return index;
+                            }
+                        } else {
+                            /*Map<String,Integer> map = calendar.getDisplayNames(field, Calendar.ALL_STYLES, locale);
+                            if ((index = matchString(text, start, field, map, calb)) > 0) {
+                                return index;
+                            }*/
+                        }
+                        break parsing;
+
+                    case global.DateFormatSymbols.PATTERN_HOUR1: // 'h' 1-based.  eg, 11PM + 1 hour =>> 12 AM
+                        /*if (!isLenient()) {
+                            // Validate the hour value in non-lenient
+                            if (value < 1 || value > 12) {
+                                break parsing;
+                            }
+                        }*/
+                        // [We computed 'value' above.]
+                        if (value == 12)
+                            value = 0;
+                        global.CalendarHelper.setField(date, 10, value);
+                        return pos.index;
+
+                    case global.DateFormatSymbols.PATTERN_ZONE_NAME:  // 'z'
+                    case global.DateFormatSymbols.PATTERN_ZONE_VALUE: // 'Z'
+                        {
+                            var sign = 0;
+                            try {
+                                var c = text.charAt(pos.index);
+                                if (c == '+') {
+                                    sign = 1;
+                                } else if (c == '-') {
+                                    sign = -1;
+                                }
+                                if (sign == 0) {
+                                    // Try parsing a custom time zone "GMT+hh:mm" or "GMT".
+                                    if ((c == 'G' || c == 'g')
+                                        && (text.length - start) >= _GMT.length
+                                        && text.substr(start, _GMT.length).search(new RegExp(_GMT, "i")) > -1) {
+                                        pos.index = start + _GMT.length;
+
+                                        if ((text.length - pos.index) > 0) {
+                                            c = text.charAt(pos.index);
+                                            if (c == '+') {
+                                                sign = 1;
+                                            } else if (c == '-') {
+                                                sign = -1;
+                                            }
+                                        }
+
+                                        if (sign == 0) {    /* "GMT" without offset */
+                                            /*calb.set(Calendar.ZONE_OFFSET, 0)
+                                                .set(Calendar.DST_OFFSET, 0);*/
+                                            return pos.index;
+                                        }
+
+                                        // Parse the rest as "hh:mm"
+                                        var i = _subParseNumericZone(text, ++pos.index,
+                                            sign, 0, true);
+                                        if (i > 0) {
+                                            return i;
+                                        }
+                                        pos.index = -i;
+                                    } else {
+                                        // Try parsing the text as a time zone
+                                        // name or abbreviation.
+                                        /*int i = subParseZoneString(text, pos.index, calb);
+                                        if (i > 0) {
+                                            return i;
+                                        }
+                                        pos.index = -i;*/
+                                    }
+                                } else {
+                                    // Parse the rest as "hhmm" (RFC 822)
+                                    var i = _subParseNumericZone(text, ++pos.index,
+                                        sign, 0, false);
+                                    if (i > 0) {
+                                        return i;
+                                    }
+                                    pos.index = -i;
+                                }
+                            } catch (e) {
+                            }
+                        }
+                        break parsing;
+
+                    case global.DateFormatSymbols.PATTERN_ISO_ZONE:   // 'X'
+                    {
+                        if ((text.length - pos.index) <= 0) {
+                            break parsing;
+                        }
+
+                        var sign = 0;
+                        var c = text.charAt(pos.index);
+                        if (c == 'Z') {
+                            // calb.set(Calendar.ZONE_OFFSET, 0).set(Calendar.DST_OFFSET, 0);
+                            return ++pos.index;
+                        }
+
+                        // parse text as "+/-hh[[:]mm]" based on count
+                        if (c == '+') {
+                            sign = 1;
+                        } else if (c == '-') {
+                            sign = -1;
+                        } else {
+                            ++pos.index;
+                            break parsing;
+                        }
+                        var i = _subParseNumericZone(text, ++pos.index, sign, count,
+                        count == 3);
+                        if (i > 0) {
+                            return i;
+                        }
+                        pos.index = -i;
+                    }
+                        break parsing;
+
+                    default:
+                        // case PATTERN_DAY_OF_MONTH:         // 'd'
+                        // case PATTERN_HOUR_OF_DAY0:         // 'H' 0-based.  eg, 23:59 + 1 hour =>> 00:59
+                        // case PATTERN_MINUTE:               // 'm'
+                        // case PATTERN_SECOND:               // 's'
+                        // case PATTERN_MILLISECOND:          // 'S'
+                        // case PATTERN_DAY_OF_YEAR:          // 'D'
+                        // case PATTERN_DAY_OF_WEEK_IN_MONTH: // 'F'
+                        // case PATTERN_WEEK_OF_YEAR:         // 'w'
+                        // case PATTERN_WEEK_OF_MONTH:        // 'W'
+                        // case PATTERN_HOUR0:                // 'K' 0-based.  eg, 11PM + 1 hour =>> 0 AM
+                        // case PATTERN_ISO_DAY_OF_WEEK:      // 'u' (pseudo field);
+
+                        // Handle "generic" fields
+                        if (obeyCount) {
+                            if ((start+count) > text.length) {
+                                break parsing;
+                            }
+                            number = _numberFormat.parse(text.substring(0, start+count), pos);
+                        } else {
+                            number = _numberFormat.parse(text, pos);
+                        }
+                        if (number != null) {
+                            value = parseInt(number, 10);
+
+                            if (useFollowingMinusSignAsDelimiter && (value < 0) &&
+                                (((pos.index < text.length) &&
+                                (text.charAt(pos.index) != _minusSign)) ||
+                                ((pos.index == text.length) &&
+                                (text.charAt(pos.index-1) == _minusSign)))) {
+                                value = -value;
+                                pos.index--;
+                            }
+
+                            global.CalendarHelper.setField(date, field, value);
+                            return pos.index;
+                        }
+                        break parsing;
+                }
+            }
+
+            // Parsing failed.
+            origPos.errorIndex = pos.index;
+            return -1;
         };
 
         var _translatePattern = function( pattern, from, to ) {
@@ -483,7 +934,7 @@
         };
 
         var _init = function() {
-            if ( arguments.length > 0 ) {
+            if ( arguments.length > 0 && arguments.length <= 2 ) {
                 var pattern = arguments[ 0 ];
                 if ( arguments.length == 1 ) {
                     _locale = global.Locale.getDefault();
@@ -503,9 +954,12 @@
                 _initializeCalendar( _locale );
                 _initialize( _locale );
             } else {
-                var timeStyle = global.DateFormat.SHORT;
-                var dateStyle = global.DateFormat.SHORT;
-                var loc = global.Locale.getDefault();
+                var timeStyle = arguments.length > 0 && typeof arguments[ 0 ] != "undefined" ?
+                    arguments[ 0 ] : global.DateFormat.SHORT;
+                var dateStyle = arguments.length > 0 && typeof arguments[ 1 ] != "undefined" ?
+                    arguments[ 1 ] : global.DateFormat.SHORT;
+                var loc = arguments.length > 0 && typeof arguments[ 2 ] != "undefined" ?
+                    arguments[ 2 ] : global.Locale.getDefault();
                 _locale = loc;
                 // initialize calendar and related fields
                 _initializeCalendar( loc );
@@ -572,6 +1026,125 @@
                 }
             }
             return toAppendTo;
+        };
+
+        this.parse = function( text, pos ) {
+            pos = pos || new global.ParsePosition( 0 );
+            _checkNegativeNumberExpression();
+
+            var start = pos.index;
+            var oldStart = start;
+            var textLength = text.length;
+
+            var ambiguousYear = [ false ];
+
+            var date = new Date( 0 );
+
+            for (var i = 0; i < _compiledPattern.length; ) {
+                var tag = _compiledPattern[i].charCodeAt( 0 ) >>> 8;
+                var count = _compiledPattern[i++].charCodeAt( 0 ) & 0xff;
+                if (count == 255) {
+                    count = _compiledPattern[i++].charCodeAt( 0 ) << 16;
+                    count |= _compiledPattern[i++].charCodeAt( 0 );
+                }
+
+                switch (tag) {
+                case _TAG_QUOTE_ASCII_CHAR:
+                    if (start >= textLength || text.charAt(start) != String.fromCharCode(count)) {
+                        pos.index = oldStart;
+                        pos.errorIndex = start;
+                        return null;
+                    }
+                    start++;
+                    break;
+
+                case _TAG_QUOTE_CHARS:
+                    while (count-- > 0) {
+                        if (start >= textLength || text.charAt(start) != _compiledPattern[i++]) {
+                            pos.index = oldStart;
+                            pos.errorIndex = start;
+                            return null;
+                        }
+                        start++;
+                    }
+                    break;
+
+                default:
+                    // Peek the next pattern to determine if we need to
+                    // obey the number of pattern letters for
+                    // parsing. It's required when parsing contiguous
+                    // digit text (e.g., "20010704") with a pattern which
+                    // has no delimiters between fields, like "yyyyMMdd".
+                    var obeyCount = false;
+
+                    // In Arabic, a minus sign for a negative number is put after
+                    // the number. Even in another locale, a minus sign can be
+                    // put after a number using DateFormat.setNumberFormat().
+                    // If both the minus sign and the field-delimiter are '-',
+                    // subParse() needs to determine whether a '-' after a number
+                    // in the given text is a delimiter or is a minus sign for the
+                    // preceding number. We give subParse() a clue based on the
+                    // information in compiledPattern.
+                    var useFollowingMinusSignAsDelimiter = false;
+
+                    if (i < _compiledPattern.length) {
+                        var nextTag = _compiledPattern[i].charCodeAt( 0 ) >>> 8;
+                        if (!(nextTag == _TAG_QUOTE_ASCII_CHAR ||
+                            nextTag == _TAG_QUOTE_CHARS)) {
+                            obeyCount = true;
+                        }
+
+                        if (_hasFollowingMinusSign &&
+                            (nextTag == _TAG_QUOTE_ASCII_CHAR ||
+                            nextTag == _TAG_QUOTE_CHARS)) {
+                            var c;
+                            if (nextTag == _TAG_QUOTE_ASCII_CHAR) {
+                                c = _compiledPattern[i].charCodeAt( 0 ) & 0xff;
+                            } else {
+                                c = _compiledPattern[i+1].charCodeAt( 0 );
+                            }
+
+                            if (String.fromCharCode(c) == _minusSign) {
+                                useFollowingMinusSignAsDelimiter = true;
+                            }
+                        }
+                    }
+                    start = _subParse(text, start, tag, count, obeyCount,
+                        ambiguousYear, pos,
+                        useFollowingMinusSignAsDelimiter, date);
+                    if (start < 0) {
+                        pos.index = oldStart;
+                        return null;
+                    }
+                }
+            }
+
+            // At this point the fields of Calendar have been set.  Calendar
+            // will fill in default values for missing fields when the time
+            // is computed.
+
+            pos.index = start;
+
+            var parsedDate;
+            try {
+                parsedDate = new Date(date.getTime());
+                // If the year value is ambiguous,
+                // then the two-digit year == the default start year
+                if (ambiguousYear[0]) {
+                    if (parsedDate.getTime() < _defaultCenturyStart.getTime()) {
+                        parsedDate.setFullYear(date.getFullYear() + 100);
+                    }
+                }
+            }
+                // An IllegalArgumentException will be thrown by Calendar.getTime()
+                // if any fields are out of range, e.g., MONTH == 17.
+            catch (e) {
+                pos.errorIndex = start;
+                pos.index = oldStart;
+                return null;
+            }
+
+            return parsedDate;
         };
 
         this.toPattern = function() {
