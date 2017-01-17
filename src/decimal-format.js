@@ -1,7 +1,12 @@
 ( function( global, factory ) {
 
     if ( typeof module === "object" && typeof module.exports === "object" ) {
+        module.require( "../resources/format-data" );
+        module.require( "./resource-bundle" );
         module.require( "./locale" );
+        module.require( "./field-position" );
+        module.require( "./parse-position" );
+        module.require( "./digit-list" );
         module.require( "./number-format" );
         module.require( "./decimal-format-symbols" );
         module.exports = factory( global );
