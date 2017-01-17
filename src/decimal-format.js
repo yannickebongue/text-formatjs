@@ -1227,8 +1227,8 @@
 
         };
 
-        this.parse = function( text ) {
-            var pos = new global.ParsePosition(0);
+        this.parse = function( text, pos ) {
+            pos = pos || new global.ParsePosition(0);
             // special case NaN
             if (text.substr(pos.index, _symbols.getNaN().length).search(_symbols.getNaN()) > -1) {
                 pos.index = pos.index + _symbols.getNaN().length;
