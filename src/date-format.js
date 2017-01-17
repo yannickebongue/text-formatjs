@@ -33,7 +33,7 @@
         try {
             return new global.SimpleDateFormat(timeStyle, dateStyle, loc);
         } catch ( e ) {
-            return new SimpleDateFormat("M/d/yy h:mm a");
+            return new global.SimpleDateFormat("M/d/yy h:mm a");
         }
     };
 
