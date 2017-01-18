@@ -55,22 +55,24 @@
         var _minExponentDigits;
 
         var _expandAffixes = function() {
+            // Reuse one StringBuffer for better performance
+            var buffer = "";
             if ( _posPrefixPattern != null ) {
-                _positivePrefix = _expandAffix( _posPrefixPattern );
+                _positivePrefix = buffer = _expandAffix( _posPrefixPattern, buffer );
             }
             if ( _posSuffixPattern != null ) {
-                _positiveSuffix = _expandAffix( _posSuffixPattern );
+                _positiveSuffix = buffer = _expandAffix( _posSuffixPattern, buffer );
             }
             if ( _negPrefixPattern != null ) {
-                _negativePrefix = _expandAffix( _negPrefixPattern );
+                _negativePrefix = buffer = _expandAffix( _negPrefixPattern, buffer );
             }
             if ( _negSuffixPattern != null ) {
-                _negativeSuffix = _expandAffix( _negSuffixPattern );
+                _negativeSuffix = buffer = _expandAffix( _negSuffixPattern, buffer );
             }
+            return buffer;
         };
 
-        var _expandAffix = function( pattern ) {
-            var buffer = "";
+        var _expandAffix = function( pattern, buffer ) {
             for ( var i = 0; i < pattern.length; ) {
                 var c = pattern.charAt( i++ );
                 if ( c === _QUOTE ) {
@@ -103,17 +105,17 @@
 
         var _appendAffixPattern = function( buffer, affixPattern, expAffix, localized ) {
             if (affixPattern == null) {
-                _appendAffix(buffer, expAffix, localized);
+                buffer = _appendAffix(buffer, expAffix, localized);
             } else {
                 var i;
                 for (var pos=0; pos<affixPattern.length; pos=i) {
                     i = affixPattern.indexOf(_QUOTE, pos);
                     if (i < 0) {
-                        _appendAffix(buffer, affixPattern.substring(pos), localized);
+                        buffer = _appendAffix(buffer, affixPattern.substring(pos), localized);
                         break;
                     }
                     if (i > pos) {
-                        _appendAffix(buffer, affixPattern.substring(pos, i), localized);
+                        buffer = _appendAffix(buffer, affixPattern.substring(pos, i), localized);
                     }
                     var c = affixPattern.charAt(++i);
                     ++i;
@@ -231,7 +233,7 @@
                             _PATTERN_ZERO_DIGIT);
                 }
                 if (j == 1) {
-                    result += _appendAffixPattern(result, _posSuffixPattern, _positiveSuffix, localized);
+                    result = _appendAffixPattern(result, _posSuffixPattern, _positiveSuffix, localized);
                     if ((_negSuffixPattern == _posSuffixPattern && // n == p == null
                         _negativeSuffix === _positiveSuffix)
                         || (_negSuffixPattern != null &&
@@ -245,7 +247,7 @@
                     result += (localized ? symbols.getPatternSeparator() :
                         _PATTERN_SEPARATOR);
                 } else {
-                    result += _appendAffixPattern(result, _negSuffixPattern, _negativeSuffix, localized);
+                    result = _appendAffixPattern(result, _negSuffixPattern, _negativeSuffix, localized);
                 }
             }
             return result.toString();
@@ -992,7 +994,7 @@
                      * calling Character.digit().  If this also fails, digit will
                      * have a value outside the range 0..9.
                      */
-                    var digit = ch - zero;
+                    var digit = parseInt(ch, 10) - parseInt(zero, 10);
                     if (digit < 0 || digit > 9) {
                         digit = parseInt(ch, 10);
                     }
