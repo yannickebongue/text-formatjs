@@ -987,6 +987,14 @@
             }
         };
 
+        this.setNumberFormat = function( newNumberFormat ) {
+            _numberFormat = newNumberFormat;
+        };
+
+        this.getNumberFormat = function() {
+            return _numberFormat;
+        };
+
         this.set2DigitYearStart = function( startDate ) {
             _parseAmbiguousDatesAsAfter( new Date( startDate.getTime() ) );
         };

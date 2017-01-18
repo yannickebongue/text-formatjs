@@ -33,7 +33,7 @@
         case 9:     // AM_PM
             return date.getHours() < 12 ? 0 : 1;
         case 10:    // HOUR
-            return date.getHours() - 12;
+            return date.getHours() % 12;
         case 11:    // HOUR_OF_DAY
             return date.getHours();
         case 12:    // MINUTE
@@ -71,9 +71,13 @@
         case 6:     // DAY_OF_YEAR
         case 7:     // DAY_OF_WEEK
         case 8:     // DAY_OF_WEEK_IN_MONTH
-        case 9:     // AM_PM
-        case 10:    // HOUR
             break;
+        case 9:     // AM_PM
+            if ( value == 1 && date.getHours() < 12 ) {
+                date.setHours( date.getHours() + 12 );
+            }
+            break;
+        case 10:    // HOUR
         case 11:    // HOUR_OF_DAY
             date.setHours( value );
             break;
