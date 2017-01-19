@@ -1,7 +1,6 @@
 ( function( global, factory ) {
 
     if ( typeof module === "object" && typeof module.exports === "object" ) {
-        module.require( "../resources/locale-names" );
         module.require( "./resource-bundle" );
         module.exports = factory( global );
     } else {
@@ -84,7 +83,7 @@
     var _defaultLocale;
 
     var _initDefault = function() {
-        var browserLanguageParts = global.navigator ? global.navigator.language.split( "-" ) : "en-US";
+        var browserLanguageParts = global.navigator ? global.navigator.language.split( "-" ) : [ "en", "US" ];
         var language = "";
         var country = "";
         if ( browserLanguageParts.length > 0 ) {
@@ -147,10 +146,10 @@
         return new Locale( language, country, variant );
     };
 
-    Locale.prototype.getDisplayName = function() {
-        var result = this.getDisplayLanguage();
-        if ( this.getDisplayCountry() ) {
-            result += " (" + this.getDisplayCountry() + ")";
+    Locale.prototype.getDisplayName = function( inLocale ) {
+        var result = this.getDisplayLanguage( inLocale );
+        if ( this.getCountry() != "" ) {
+            result += " (" + this.getDisplayCountry( inLocale ) + ")";
         }
         return result;
     };
