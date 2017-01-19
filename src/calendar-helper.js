@@ -25,11 +25,11 @@
         case 5:     // DATE, DAY_OF_MONTH
             return date.getDate();
         case 6:     // DAY_OF_YEAR
-            return null;
+            return CalendarHelper.computeDayOfYear( date );
         case 7:     // DAY_OF_WEEK
             return date.getDay() + 1;
         case 8:     // DAY_OF_WEEK_IN_MONTH
-            return null;
+            return Math.floor( ( ( date.getDate() - 1 ) / 7 ) + 1 );
         case 9:     // AM_PM
             return date.getHours() < 12 ? 0 : 1;
         case 10:    // HOUR
@@ -69,8 +69,13 @@
             date.setDate( value );
             break;
         case 6:     // DAY_OF_YEAR
+            date.setMonth( 0, value );
+            break;
         case 7:     // DAY_OF_WEEK
+            date.setDate( ( date.getDate() + value ) - ( date.getDay() + 1 ) );
+            break;
         case 8:     // DAY_OF_WEEK_IN_MONTH
+            date.setDate( ( value - CalendarHelper.getField( date, 8 ) ) * 7 + date.getDate() );
             break;
         case 9:     // AM_PM
             if ( value == 1 && date.getHours() < 12 ) {
@@ -91,6 +96,8 @@
             date.setMilliseconds( value );
             break;
         case 15:    // ZONE_OFFSET
+            date.setMinutes( date.getMinutes() + date.getTimezoneOffset() - value );
+            break;
         case 16:    // DST_OFFSET
         default:
             break;
@@ -131,6 +138,13 @@
         }
         sb += d;
         return sb;
+    };
+
+    CalendarHelper.computeDayOfYear = function( date ) {
+        var year = date.getFullYear();
+        var start = new Date( year, 0, 0, 0, 0, 0, 0 );
+        var end = new Date( year, date.getMonth(), date.getDate(), 0, 0, 0, 0 );
+        return ( end.getTime() - start.getTime() ) / ( 24 * 60 * 60 * 1000 );
     };
 
     global.CalendarHelper = CalendarHelper;

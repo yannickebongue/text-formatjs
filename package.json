@@ -2,7 +2,7 @@
   "name": "text-format",
   "title": "Text Format",
   "description": "A javascript library for formatting locale-sensitive information such as dates, messages and numbers",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "dist/text-format.js",
   "keywords": ["text", "format", "locale", "date", "message", "number", "decimal", "time", "i18n"],
   "license": "MIT",
