@@ -56,23 +56,22 @@
 
         var _expandAffixes = function() {
             // Reuse one StringBuffer for better performance
-            var buffer = "";
-            if ( _posPrefixPattern != null ) {
-                _positivePrefix = buffer = _expandAffix( _posPrefixPattern, buffer );
+            if ( _posPrefixPattern ) {
+                _positivePrefix = _expandAffix( _posPrefixPattern );
             }
-            if ( _posSuffixPattern != null ) {
-                _positiveSuffix = buffer = _expandAffix( _posSuffixPattern, buffer );
+            if ( _posSuffixPattern ) {
+                _positiveSuffix = _expandAffix( _posSuffixPattern );
             }
-            if ( _negPrefixPattern != null ) {
-                _negativePrefix = buffer = _expandAffix( _negPrefixPattern, buffer );
+            if ( _negPrefixPattern ) {
+                _negativePrefix = _expandAffix( _negPrefixPattern );
             }
-            if ( _negSuffixPattern != null ) {
-                _negativeSuffix = buffer = _expandAffix( _negSuffixPattern, buffer );
+            if ( _negSuffixPattern ) {
+                _negativeSuffix = _expandAffix( _negSuffixPattern );
             }
-            return buffer;
         };
 
-        var _expandAffix = function( pattern, buffer ) {
+        var _expandAffix = function( pattern ) {
+            var buffer = "";
             for ( var i = 0; i < pattern.length; ) {
                 var c = pattern.charAt( i++ );
                 if ( c === _QUOTE ) {
