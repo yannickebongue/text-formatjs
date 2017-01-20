@@ -1,7 +1,6 @@
 ( function( global, factory ) {
 
     if ( typeof module === "object" && typeof module.exports === "object" ) {
-        module.require( "../resources/currency-names" );
         module.require( "./resource-bundle" );
         module.require( "./currency-data" );
         module.require( "./locale" );
