@@ -4,7 +4,17 @@
   "description": "A javascript library for formatting locale-sensitive information such as dates, messages and numbers",
   "version": "0.1.3",
   "main": "dist/text-format.js",
-  "keywords": ["text", "format", "locale", "date", "message", "number", "decimal", "time", "i18n"],
+  "keywords": [
+    "text",
+    "format",
+    "locale",
+    "date",
+    "message",
+    "number",
+    "decimal",
+    "time",
+    "i18n"
+  ],
   "license": "MIT",
   "author": {
     "name": "Yannick Ebongue",
@@ -14,5 +24,10 @@
     "type": "git",
     "url": "https://github.com/yannickebongue/text-format.git"
   },
-  "bugs": "https://github.com/yannickebongue/text-format/issues"
+  "bugs": "https://github.com/yannickebongue/text-format/issues",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-uglify": "^2.0.0"
+  }
 }
