@@ -90,6 +90,10 @@
         global.Format.Field.call( this, name );
     };
 
+    DateFormat.Field.prototype = Object.create( global.Format.Field.prototype );
+
+    DateFormat.Field.prototype.constructor = DateFormat.Field;
+
     DateFormat.Field.ERA = new DateFormat.Field( "era" );
     DateFormat.Field.YEAR = new DateFormat.Field( "year" );
     DateFormat.Field.MONTH = new DateFormat.Field( "month" );
@@ -108,10 +112,6 @@
     DateFormat.Field.HOUR1 = new DateFormat.Field( "hour 1" );
     DateFormat.Field.HOUR0 = new DateFormat.Field( "hour" );
     DateFormat.Field.TIME_ZONE = new DateFormat.Field( "time zone" );
-
-    DateFormat.Field.prototype = Object.create( global.Format.Field.prototype );
-
-    DateFormat.Field.prototype.constructor = DateFormat.Field;
 
     global.DateFormat = DateFormat;
 
