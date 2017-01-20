@@ -25,12 +25,14 @@
     "url": "https://github.com/yannickebongue/text-formatjs.git"
   },
   "scripts": {
-    "postinstall": "grunt default"
+    "postinstall": "grunt",
+    "test": "grunt test"
   },
   "bugs": "https://github.com/yannickebongue/text-formatjs/issues",
   "dependencies": {
     "grunt": "1.0.1",
     "grunt-contrib-clean": "1.0.0",
+    "grunt-contrib-qunit": "^1.2.0",
     "grunt-contrib-uglify": "2.0.0"
   }
 }

@@ -81,13 +81,19 @@ module.exports = function( grunt ) {
                     "dist/text-resources.min.js": "dist/text-resources.js"
                 }
             }
+        },
+
+        qunit: {
+            all: [ "test/unit/*/**/*.html" ]
         }
 
     } );
 
     grunt.loadNpmTasks( "grunt-contrib-clean" );
     grunt.loadNpmTasks( "grunt-contrib-uglify" );
+    grunt.loadNpmTasks( "grunt-contrib-qunit" );
 
     grunt.registerTask( "default", [ "clean", "uglify:js", "uglify:main", "uglify:resources" ] );
+    grunt.registerTask( "test", [ "qunit" ] );
 
 };
