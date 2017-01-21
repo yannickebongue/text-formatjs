@@ -1,7 +1,6 @@
 ( function( global, factory ) {
 
     if ( typeof module === "object" && typeof module.exports === "object" ) {
-        module.require( "../resources/format-data" );
         module.require( "./resource-bundle" );
         module.require( "./locale" );
         module.exports = factory( global );

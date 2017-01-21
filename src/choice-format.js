@@ -186,7 +186,7 @@
         };
 
         if ( arguments.length == 2 ) {
-            this.setChoices.apply( this, arguments.slice() );
+            this.setChoices.apply( this, arguments );
         } else {
             this.applyPattern( newPattern );
         }
