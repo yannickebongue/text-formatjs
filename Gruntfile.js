@@ -55,6 +55,25 @@ module.exports = function( grunt ) {
 
         uglify: {
             options: {
+                mangle: {
+                    except: [
+                        "CalendarHelper",
+                        "ChoiceFormat",
+                        "Currency",
+                        "DateFormat",
+                        "DateFormatSymbols",
+                        "DecimalFormat",
+                        "DecimalFormatSymbols",
+                        "DigitList",
+                        "FieldPosition",
+                        "ParsePosition",
+                        "Format",
+                        "Locale",
+                        "NumberFormat",
+                        "ResourceBundle",
+                        "SimpleDateFormat"
+                    ]
+                },
                 sourceMap: true,
                 banner: "/*! <%=pkg.name %> | <%= pkg.version %> | <%= grunt.template.today('yyyy-mm-dd') %> */\n"
             },
