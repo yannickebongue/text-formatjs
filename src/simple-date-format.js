@@ -10,6 +10,7 @@
         module.require( "./calendar-helper" );
         module.require( "./date-format" );
         module.require( "./date-format-symbols" );
+        module.require( "./message-format" );
         module.exports = factory( global );
     } else {
         factory( global );
@@ -969,8 +970,7 @@
                 if ( ( timeStyle >= 0 ) && ( dateStyle >= 0 ) ) {
                     var dateTimeArgs = [ dateTimePatterns[ timeStyle ],
                         dateTimePatterns[ dateStyle + 4 ] ];
-                    // _pattern = MessageFormat.format(dateTimePatterns[ 8 ], dateTimeArgs);
-                    _pattern = dateTimeArgs.reverse().join( " " );
+                    _pattern = MessageFormat.format(dateTimePatterns[ 8 ], dateTimeArgs);
                 }
                 else if ( timeStyle >= 0 ) {
                     _pattern = dateTimePatterns[ timeStyle ];
