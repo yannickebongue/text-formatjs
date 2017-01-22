@@ -1292,6 +1292,13 @@
 
     SimpleDateFormat.prototype.constructor = SimpleDateFormat;
 
+    SimpleDateFormat.prototype.equals = function( that ) {
+        if ( !global.DateFormat.equals.apply( this, [ that ] ) ) return false; // super does class check
+        if ( !( that instanceof SimpleDateFormat) ) return false;
+        return ( this.toPattern() == that.toPattern()
+            && this.getNumberFormat().equals( that.getNumberFormat() ) );
+    };
+
     global.SimpleDateFormat = SimpleDateFormat;
 
     return SimpleDateFormat;
