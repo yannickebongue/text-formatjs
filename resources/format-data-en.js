@@ -10,7 +10,7 @@
 }( this, function( global ) {
 
     global.FormatData[ "en" ] = {
-        "NumberPatterns": [ "#,##0.###;-#,##0.###", "¤#,##0.00;-¤#,##0.00",
+        "NumberPatterns": [ "#,##0.###;-#,##0.###", "\u00a4#,##0.00;-\u00a4#,##0.00",
             "#,##0%" ],
         "DateTimePatternChars": "GyMdkHmsSEDFwWahKzZ"
     };

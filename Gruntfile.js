@@ -27,7 +27,15 @@ module.exports = function( grunt ) {
         "simple-date-format.js"
     ];
 
-    var sourceFiles = coreFiles.concat( numberFormatFiles ).concat( dateFormatFiles ).map( function( file ) {
+    var messageFormatFiles = [
+        "message-format.js"
+    ];
+
+    var sourceFiles = coreFiles
+        .concat( numberFormatFiles )
+        .concat( dateFormatFiles )
+        .concat( messageFormatFiles )
+        .map( function( file ) {
         return "src/" + file;
     } );
 
@@ -41,7 +49,7 @@ module.exports = function( grunt ) {
     var resourceFiles = [];
     resourceNames.forEach( function( baseName ) {
         var pattern = resourceDir + baseName + "-*.js";
-        resourceFiles.push( resourceDir + baseName + ".js" );
+        sourceFiles.push( resourceDir + baseName + ".js" );
         resourceFiles = resourceFiles.concat( grunt.file.expandMapping( pattern ).map( function( item ) {
             return item.dest;
         } ) );
@@ -69,6 +77,7 @@ module.exports = function( grunt ) {
                         "ParsePosition",
                         "Format",
                         "Locale",
+                        "MessageFormat",
                         "NumberFormat",
                         "ResourceBundle",
                         "SimpleDateFormat"
