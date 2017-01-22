@@ -26,6 +26,7 @@ module.exports = function( grunt ) {
         "date-format.js",
         "simple-date-format.js"
     ];
+
     var messageFormatFiles = [
         "message-format.js"
     ];
