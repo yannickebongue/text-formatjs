@@ -49,7 +49,7 @@ module.exports = function( grunt ) {
     var resourceFiles = [];
     resourceNames.forEach( function( baseName ) {
         var pattern = resourceDir + baseName + "-*.js";
-        resourceFiles.push( resourceDir + baseName + ".js" );
+        sourceFiles.push( resourceDir + baseName + ".js" );
         resourceFiles = resourceFiles.concat( grunt.file.expandMapping( pattern ).map( function( item ) {
             return item.dest;
         } ) );
