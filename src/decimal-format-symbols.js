@@ -202,6 +202,27 @@
         _initialize( locale || global.Locale.getDefault() );
     }
 
+    DecimalFormatSymbols.prototype.equals = function( other ) {
+        if ( !other ) return false;
+        if ( this == other ) return true;
+        if ( !( other instanceof DecimalFormatSymbols ) ) return false;
+        return ( this.getZeroDigit() == other.getZeroDigit() &&
+            this.getGroupingSeparator() == other.getGroupingSeparator() &&
+            this.getDecimalSeparator() == other.getDecimalSeparator() &&
+            this.getPercent() == other.getPercent() &&
+            this.getPerMill() == other.getPerMill() &&
+            this.getDigit() == other.getDigit() &&
+            this.getMinusSign() == other.getMinusSign() &&
+            this.getPatternSeparator() == other.getPatternSeparator() &&
+            this.getInfinity() == other.getInfinity() &&
+            this.getNaN() == other.getNaN() &&
+            this.getCurrencySymbol() == other.getCurrencySymbol() &&
+            this.getInternationalCurrencySymbol() == other.getInternationalCurrencySymbol() &&
+            this.getCurrency().getCurrencyCode() == other.getCurrency().getCurrencyCode() &&
+            this.getMonetaryDecimalSeparator() == other.getMonetaryDecimalSeparator() &&
+            this.getExponentSeparator() == other.getExponentSeparator() );
+    };
+
     global.DecimalFormatSymbols = DecimalFormatSymbols;
 
     return DecimalFormatSymbols;

@@ -86,6 +86,11 @@
 
     DateFormat.prototype.constructor = DateFormat;
 
+    DateFormat.prototype.equals = function( other ) {
+        if (this == other) return true;
+        return other && other instanceof DecimalFormatSymbols;
+    };
+
     DateFormat.Field = function Field( name ) {
         global.Format.Field.call( this, name );
     };

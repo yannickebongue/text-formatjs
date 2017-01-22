@@ -1373,6 +1373,21 @@
 
     DecimalFormat.prototype.constructor = DecimalFormat;
 
+    DecimalFormat.prototype.equals = function( other ) {
+        if ( !other ) return false;
+        if ( !global.NumberFormat.prototype.equals.apply( this, [ other ] ) ) return false; // super does class check
+        if ( !( other instanceof DecimalFormat) ) return false;
+        return this.toPattern() == other.toPattern()
+            && this.getMultiplier() == other.getMultiplier()
+            && this.getGroupingSize() == other.getGroupingSize()
+            && this.isDecimalSeparatorAlwaysShown() == other.isDecimalSeparatorAlwaysShown()
+            && this.getMaximumIntegerDigits() == other.getMaximumIntegerDigits()
+            && this.getMinimumIntegerDigits() == other.getMinimumIntegerDigits()
+            && this.getMaximumFractionDigits() == other.getMaximumFractionDigits()
+            && this.getMinimumFractionDigits() == other.getMinimumFractionDigits()
+            && this.getDecimalFormatSymbols().equals(other.getDecimalFormatSymbols());
+    };
+
     global.DecimalFormat = DecimalFormat;
 
     return DecimalFormat;

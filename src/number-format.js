@@ -129,6 +129,24 @@
 
     NumberFormat.prototype.constructor = NumberFormat;
 
+    NumberFormat.prototype.equals = function( other ) {
+        if ( !other ) {
+            return false;
+        }
+        if ( this == other ) {
+            return true;
+        }
+        if ( !( other instanceof NumberFormat) ) {
+            return false;
+        }
+        return ( this.getMaximumIntegerDigits() == other.getMaximumIntegerDigits()
+        && this.getMinimumIntegerDigits() == other.getMinimumIntegerDigits()
+        && this.getMaximumFractionDigits() == other.getMaximumFractionDigits()
+        && this.getMinimumFractionDigits() == other.getMinimumFractionDigits()
+        && this.isGroupingUsed() == other.isGroupingUsed()
+        && this.isParseIntegerOnly() == other.isParseIntegerOnly() );
+    };
+
     NumberFormat.Field = function Field( name ) {
         global.Format.Field.call( this, name );
     };

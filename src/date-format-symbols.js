@@ -120,6 +120,18 @@
         return dst;
     };
 
+    DateFormatSymbols.prototype.equals = function( that ) {
+        if ( this == that ) return true;
+        if ( !( that && that instanceof DecimalFormatSymbols ) ) return false;
+        return (this.getEras().toString() == that.getEras().toString()
+            && this.getMonths().toString() == that.getMonths().toString()
+            && this.getShortMonths().toString() == that.getShortMonths().toString()
+            && this.getWeekdays().toString() == that.getWeekdays().toString()
+            && this.getShortWeekdays().toString() == that.getShortWeekdays().toString()
+            && this.getAmPmStrings().toString() == that.getAmPmStrings().toString()
+            && this.getLocalPatternChars() == that.getLocalPatternChars());
+    };
+
     DateFormatSymbols.patternChars = "GyMdkHmsSEDFwWahKzZYuX";
 
     DateFormatSymbols.PATTERN_ERA                  =  0; // G

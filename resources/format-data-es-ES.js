@@ -10,7 +10,7 @@
 }( this, function( global ) {
 
     global.FormatData[ "es-ES" ] = {
-        "NumberPatterns": [ "#,##0.###;-#,##0.###", "#,##0 ¤;-#,##0 ¤", "#,##0%" ]
+        "NumberPatterns": [ "#,##0.###;-#,##0.###", "#,##0 \u00A4;-#,##0 \u00A4", "#,##0%" ]
     };
 
     return global.FormatData[ "es-ES" ];
