@@ -11,6 +11,7 @@
 }( this, function( global ) {
 
     function ChoiceFormat( newPattern ) {
+        global.NumberFormat.call( this );
         var _choiceLimits;
         var _choiceFormats;
 
@@ -223,6 +224,10 @@
         /* if entering here, d is a nonzero value */
         return d + ( ( positive ? 1 : -1 ) * 1e-15 );
     };
+
+    ChoiceFormat.prototype = Object.create( global.NumberFormat.prototype );
+
+    ChoiceFormat.prototype.constructor = ChoiceFormat;
 
     global.ChoiceFormat = ChoiceFormat;
 
