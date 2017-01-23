@@ -1,5 +1,14 @@
 QUnit.module( "text-format: message-format" );
 
+QUnit.test( "Format message", function( assert ) {
+    var planet = 7;
+    var event = "a disturbance in the Force";
+    var date = new Date( 2053, 6, 3, 12, 30 );
+    Locale.setDefault( new Locale( "en", "US" ) );
+    assert.equal( MessageFormat.format( "At {1,time,short} on {1,date}, there was {2} on planet {0,number,integer}.", planet, date, event ),
+        "At 12:30 PM on Jul 3, 2053, there was a disturbance in the Force on planet 7." );
+} );
+
 QUnit.test( "Message format 1", function( assert ) {
     var form = new MessageFormat( "The disk \"{1}\" contains {0}.", new Locale( "en", "US" ) );
     var fileLimits = [ 0, 1, 2 ];
@@ -31,6 +40,28 @@ QUnit.test( "Message format 2", function( assert ) {
     ];
     fileCounts.forEach( function( fileCount, i ) {
         assert.equal( form.format( [ fileCount, "MyDisk" ] ), results[ i ] );
+    } );
+} );
+
+QUnit.test( "Message format 3", function( assert ) {
+    var fileLimits = [ 0, 1, 2 ];
+    var fileParts = [ "are no files", "is one file", "are {2} files" ];
+    var fileForm = new ChoiceFormat( fileLimits, fileParts );
+    var formats = [ fileForm, null, NumberFormat.getInstance() ];
+    var args = [ null, "ADisk", null ];
+    var form = new MessageFormat( "There {0} on {1}" );
+    var results = [
+        "There are no files on ADisk",
+        "There is one file on ADisk",
+        "There are 2 files on ADisk",
+        "There are 3 files on ADisk",
+        "There are 4 files on ADisk"
+    ];
+    form.setFormats( formats );
+    assert.equal( form.toPattern(), "There {0,choice,0#are no files|1#is one file|2#are {2} files} on {1}" );
+    results.forEach( function( result, i ) {
+        args[ 2 ] = args[ 0 ] = i;
+        assert.equal( form.format( args ), result );
     } );
 } );
 
