@@ -1173,8 +1173,8 @@
             }
         };
 
-        this.format = function( number ) {
-            var result = "";
+        this.format = function( number, toAppendTo ) {
+            var result = typeof toAppendTo == "string" ? toAppendTo : "";
             if (isNaN(number) ||
                 (!isFinite(number) && _multiplier == 0)) {
                 result += _symbols.getNaN();

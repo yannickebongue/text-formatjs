@@ -1002,8 +1002,8 @@
             return new Date( _defaultCenturyStart.getTime() );
         };
 
-        this.format = function( date ) {
-            var toAppendTo = "";
+        this.format = function( date, toAppendTo ) {
+            toAppendTo = typeof toAppendTo == "string" ? toAppendTo : "";
             // Convert input date to time field list
             _date = date;
 

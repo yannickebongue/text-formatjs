@@ -145,7 +145,8 @@
             return _choiceFormats;
         };
 
-        this.format = function( number ) {
+        this.format = function( number, toAppendTo ) {
+            toAppendTo = typeof toAppendTo == "string" ? toAppendTo : "";
             // find the number
             var i;
             for ( i = 0; i < _choiceLimits.length; ++i ) {
@@ -157,7 +158,7 @@
             --i;
             if ( i < 0 ) i = 0;
             // return either a formatted number, or a string
-            return _choiceFormats[ i ];
+            return toAppendTo + _choiceFormats[ i ];
         };
 
         this.parse = function( text ) {
