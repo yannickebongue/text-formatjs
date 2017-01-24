@@ -83,7 +83,6 @@ module.exports = function( grunt ) {
                         "SimpleDateFormat"
                     ]
                 },
-                sourceMap: true,
                 banner: "/*! <%=pkg.name %> | <%= pkg.version %> | <%= grunt.template.today('yyyy-mm-dd') %> */\n"
             },
             js: {
@@ -91,7 +90,6 @@ module.exports = function( grunt ) {
                     mangle: false,
                     compress: false,
                     beautify: true,
-                    sourceMap: false,
                     preserveComments: "all"
                 },
                 files: {
@@ -99,13 +97,12 @@ module.exports = function( grunt ) {
                     "dist/text-resources.js": resourceFiles
                 }
             },
-            main: {
+            all: {
+                options: {
+                    sourceMap: true
+                },
                 files: {
-                    "dist/text-format.min.js": "dist/text-format.js"
-                }
-            },
-            resources: {
-                files: {
+                    "dist/text-format.min.js": "dist/text-format.js",
                     "dist/text-resources.min.js": "dist/text-resources.js"
                 }
             }
@@ -121,7 +118,7 @@ module.exports = function( grunt ) {
     grunt.loadNpmTasks( "grunt-contrib-uglify" );
     grunt.loadNpmTasks( "grunt-contrib-qunit" );
 
-    grunt.registerTask( "default", [ "clean", "uglify:js", "uglify:main", "uglify:resources" ] );
+    grunt.registerTask( "default", [ "clean", "uglify:js", "uglify:all" ] );
     grunt.registerTask( "test", [ "qunit" ] );
 
 };

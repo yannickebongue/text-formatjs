@@ -1,0 +1,10 @@
+.idea/
+
+resources/
+src/
+test/
+
+
+.gitattributes
+
+Gruntfile.js
