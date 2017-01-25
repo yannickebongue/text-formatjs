@@ -1,21 +1,5 @@
-(function(global, factory) {
-
-    if (typeof module === "object" && typeof module.exports === "object") {
-        module.require("./locale");
-        module.require("./field-position");
-        module.require("./parse-position");
-        module.require("./number-format");
-        module.require("./decimal-format-symbols");
-        module.require("./decimal-format");
-        module.require("./choice-format");
-        module.require("./date-format");
-        module.require("./simple-date-format");
-        module.exports = factory(global);
-    } else {
-        factory(global);
-    }
-
-}(this, function(global) {
+(function() {
+    var global = this;
 
     var ChoiceFormat = global.ChoiceFormat;
     var DateFormat = global.DateFormat;
@@ -591,7 +575,7 @@
         var ls = s.trim().toLowerCase();
         if (ls != s) {
             for (i = 0; i < list.length; ++i) {
-                if (ls.equals(list[i]))
+                if (ls === list[i])
                     return i;
             }
         }
@@ -652,4 +636,4 @@
 
     return MessageFormat;
 
-}));
+})();

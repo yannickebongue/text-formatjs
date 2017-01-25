@@ -1,14 +1,5 @@
-( function( global, factory ) {
-
-    if ( typeof module === "object" && typeof module.exports === "object" ) {
-        module.require( "./locale" );
-        module.require( "./number-format" );
-        module.exports = factory( global );
-    } else {
-        factory( global );
-    }
-
-}( this, function( global ) {
+( function() {
+    var global = this;
 
     function ChoiceFormat( newPattern ) {
         global.NumberFormat.call( this );
@@ -234,4 +225,4 @@
 
     return ChoiceFormat;
 
-} ) );
+} )();

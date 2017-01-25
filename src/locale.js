@@ -1,14 +1,5 @@
-( function( global, factory ) {
-
-    if ( typeof module === "object" && typeof module.exports === "object" ) {
-        module.require( "./resource-bundle" );
-        module.require( "./message-format" );
-        module.exports = factory( global );
-    } else {
-        factory( global );
-    }
-
-}( this, function( global ) {
+( function() {
+    var global = this;
 
     function Locale( language, country, variant ) {
         var _DISPLAY_LANGUAGE = 0;
@@ -332,4 +323,4 @@
 
     return Locale;
 
-} ) );
+} )();
