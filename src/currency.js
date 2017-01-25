@@ -1,15 +1,5 @@
-( function( global, factory ) {
-
-    if ( typeof module === "object" && typeof module.exports === "object" ) {
-        module.require( "./resource-bundle" );
-        module.require( "./currency-data" );
-        module.require( "./locale" );
-        module.exports = factory( global );
-    } else {
-        factory( global );
-    }
-
-}( this, function( global ) {
+( function() {
+    var global = this;
 
     function Currency( currencyCode, defaultFractionDigits, numericCode ) {
         var _currencyCode = currencyCode;
@@ -94,4 +84,4 @@
 
     return Currency;
 
-} ) );
+} )();

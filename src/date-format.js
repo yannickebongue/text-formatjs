@@ -1,15 +1,5 @@
-( function( global, factory ) {
-
-    if ( typeof module === "object" && typeof module.exports === "object" ) {
-        module.require( "locale" );
-        module.require( "format" );
-        module.require( "simple-date-format" );
-        module.exports = factory( global );
-    } else {
-        factory( global );
-    }
-
-}( this, function( global ) {
+( function() {
+    var global = this;
 
     function DateFormat() {
         global.Format.call( this );
@@ -122,4 +112,4 @@
 
     return DateFormat;
 
-} ) );
+} )();

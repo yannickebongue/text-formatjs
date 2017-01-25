@@ -1,14 +1,5 @@
-( function( global, factory ) {
-
-    if ( typeof module === "object" && typeof module.exports === "object" ) {
-        module.require( "./resource-bundle" );
-        module.require( "./locale" );
-        module.exports = factory( global );
-    } else {
-        factory( global );
-    }
-
-}( this, function( global ) {
+( function() {
+    var global = this;
 
     function DateFormatSymbols( locale ) {
         var _eras = null;
@@ -161,4 +152,4 @@
 
     return DateFormatSymbols;
 
-} ) );
+} )();

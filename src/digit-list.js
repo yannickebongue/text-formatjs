@@ -1,12 +1,5 @@
-( function( global, factory ) {
-
-    if ( typeof module === "object" && typeof module.exports === "object" ) {
-        module.exports = factory( global );
-    } else {
-        factory( global );
-    }
-
-}( this, function( global ) {
+( function() {
+    var global = this;
 
     function DigitList() {
         var _this = this;
@@ -270,4 +263,4 @@
 
     return DigitList;
 
-} ) );
+} )();

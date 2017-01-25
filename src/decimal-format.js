@@ -1,19 +1,5 @@
-( function( global, factory ) {
-
-    if ( typeof module === "object" && typeof module.exports === "object" ) {
-        module.require( "./resource-bundle" );
-        module.require( "./locale" );
-        module.require( "./field-position" );
-        module.require( "./parse-position" );
-        module.require( "./digit-list" );
-        module.require( "./number-format" );
-        module.require( "./decimal-format-symbols" );
-        module.exports = factory( global );
-    } else {
-        factory( global );
-    }
-
-}( this, function( global ) {
+( function() {
+    var global = this;
 
     function DecimalFormat( pattern, symbols ) {
         global.NumberFormat.call( this );
@@ -1392,4 +1378,4 @@
 
     return DecimalFormat;
 
-} ) );
+} )();
