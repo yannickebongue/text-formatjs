@@ -1,15 +1,5 @@
-( function( global, factory ) {
-
-    if ( typeof module === "object" && typeof module.exports === "object" ) {
-        module.require( "./resource-bundle" );
-        module.require( "./locale" );
-        module.require( "./currency" );
-        module.exports = factory( global );
-    } else {
-        factory( global );
-    }
-
-}( this, function( global ) {
+( function() {
+    var global = this;
 
     function DecimalFormatSymbols( locale ) {
         var _zeroDigit = null;
@@ -227,4 +217,4 @@
 
     return DecimalFormatSymbols;
 
-} ) );
+} )();

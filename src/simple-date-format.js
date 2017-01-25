@@ -1,22 +1,5 @@
-( function( global, factory ) {
-
-    if ( typeof module === "object" && typeof module.exports === "object" ) {
-        module.require( "./resource-bundle" );
-        module.require( "./locale" );
-        module.require( "./field-position" );
-        module.require( "./parse-position" );
-        module.require( "./number-format" );
-        module.require( "./decimal-format" );
-        module.require( "./calendar-helper" );
-        module.require( "./date-format" );
-        module.require( "./date-format-symbols" );
-        module.require( "./message-format" );
-        module.exports = factory( global );
-    } else {
-        factory( global );
-    }
-
-}( this, function( global ) {
+( function() {
+    var global = this;
 
     function SimpleDateFormat() {
         var _date;
@@ -1303,4 +1286,4 @@
 
     return SimpleDateFormat;
 
-} ) );
+} )();
