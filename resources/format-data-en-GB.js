@@ -1,13 +1,5 @@
-( function( global, factory ) {
-
-    if ( typeof module === "object" && typeof module.exports === "object" ) {
-        module.require( "./format-data" );
-        module.exports = factory( global );
-    } else {
-        factory( global );
-    }
-
-}( this, function( global ) {
+( function() {
+    var global = this;
 
     global.FormatData[ "en-GB" ] = {
         "DateTimePatterns": [ "HH:mm:ss 'o''clock' z", "HH:mm:ss z", "HH:mm:ss",
@@ -18,4 +10,4 @@
 
     return global.FormatData[ "en-GB" ];
 
-} ) );
+} )();

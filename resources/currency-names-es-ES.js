@@ -1,19 +1,11 @@
-( function( global, factory ) {
-
-    if ( typeof module === "object" && typeof module.exports === "object" ) {
-        module.require( "./currency-names" );
-        module.exports = factory( global );
-    } else {
-        factory( global );
-    }
-
-}( this, function( global ) {
+( function() {
+    var global = this;
 
     global.CurrencyNames[ "es-ES" ] = {
         "ESP": "Pts",
-        "EUR": "€"
+        "EUR": "\u20AC"
     };
 
     return global.CurrencyNames[ "es-ES" ];
 
-} ) );
+} )();
