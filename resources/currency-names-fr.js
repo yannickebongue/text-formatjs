@@ -1,13 +1,5 @@
-( function( global, factory ) {
-
-    if ( typeof module === "object" && typeof module.exports === "object" ) {
-        module.require( "./currency-names" );
-        module.exports = factory( global );
-    } else {
-        factory( global );
-    }
-
-}( this, function( global ) {
+( function() {
+    var global = this;
 
     global.CurrencyNames[ "fr" ] = {
         "adp": "peseta andorrane",
@@ -224,4 +216,4 @@
 
     return global.CurrencyNames[ "fr" ];
 
-} ) );
+} )();

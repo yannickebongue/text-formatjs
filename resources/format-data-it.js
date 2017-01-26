@@ -1,13 +1,5 @@
-( function( global, factory ) {
-
-    if ( typeof module === "object" && typeof module.exports === "object" ) {
-        module.require( "./format-data" );
-        module.exports = factory( global );
-    } else {
-        factory( global );
-    }
-
-}( this, function( global ) {
+( function() {
+    var global = this;
 
     global.FormatData[ "it" ] = {
         "MonthNames": [ "gennaio", "febbraio", "marzo", "aprile", "maggio",
@@ -28,4 +20,4 @@
 
     return global.FormatData[ "it" ];
 
-} ) );
+} )();
