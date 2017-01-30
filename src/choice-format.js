@@ -1,8 +1,10 @@
 ( function() {
     var global = this;
+    var NumberFormat = global.NumberFormat;
+    var ParsePosition = global.ParsePosition;
 
     function ChoiceFormat( newPattern ) {
-        global.NumberFormat.call( this );
+        NumberFormat.call( this );
         var _choiceLimits;
         var _choiceFormats;
 
@@ -136,7 +138,7 @@
             return _choiceFormats;
         };
 
-        this.format = function( number, toAppendTo ) {
+        this.format = function( number, toAppendTo, status ) {
             toAppendTo = typeof toAppendTo == "string" ? toAppendTo : "";
             // find the number
             var i;
@@ -152,9 +154,9 @@
             return toAppendTo + _choiceFormats[ i ];
         };
 
-        this.parse = function( text ) {
+        this.parse = function( text, status ) {
             // find the best number (defined as the one with the longest parse)
-            var status = new global.ParsePosition( 0 );
+            status = status || new ParsePosition( 0 );
             var start = status.index;
             var furthest = start;
             var bestNumber = Number.NaN;
@@ -217,7 +219,7 @@
         return d + ( ( positive ? 1 : -1 ) * 1e-15 );
     };
 
-    ChoiceFormat.prototype = Object.create( global.NumberFormat.prototype );
+    ChoiceFormat.prototype = Object.create( NumberFormat.prototype );
 
     ChoiceFormat.prototype.constructor = ChoiceFormat;
 
