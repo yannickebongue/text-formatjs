@@ -1,7 +1,19 @@
 ( function() {
     var global = this;
 
+    var CalendarHelper = global.CalendarHelper;
+    var DateFormat = global.DateFormat;
+    var DecimalFormat = global.DecimalFormat;
+    var DateFormatSymbols = global.DateFormatSymbols;
+    var FieldPosition = global.FieldPosition;
+    var Locale = global.Locale;
+    var NumberFormat = global.NumberFormat;
+    var ParsePosition = global.ParsePosition;
+    var ResourceBundle = global.ResourceBundle;
+
     function SimpleDateFormat() {
+        DateFormat.call( this );
+
         var _date;
         var _numberFormat;
         var _pattern;
@@ -21,7 +33,7 @@
             // Verify and compile the given pattern.
             _compiledPattern = _compile( _pattern );
 
-            _numberFormat = global.NumberFormat.getIntegerInstance( loc );
+            _numberFormat = NumberFormat.getIntegerInstance( loc );
             _numberFormat.setGroupingUsed( false );
 
             _initializeDefaultCentury();
@@ -133,7 +145,7 @@
                 }
 
                 var tag;
-                if ( ( tag = global.DateFormatSymbols.patternChars.indexOf( c ) ) == -1 ) {
+                if ( ( tag = DateFormatSymbols.patternChars.indexOf( c ) ) == -1 ) {
                     throw "Illegal pattern character " +
                         "'" + c + "'";
                 }
@@ -159,19 +171,19 @@
             return compiledPattern.split( "" );
         };
 
-        var _subFormat = function( patternCharIndex, count, buffer, useDateFormatSymbols ) {
+        var _subFormat = function( patternCharIndex, count, delegate, buffer, useDateFormatSymbols ) {
             var maxIntCount = 0x7fffffff;
             var current = null;
-            // var beginOffset = buffer.length;
+            var beginOffset = buffer.length;
 
             var field = _PATTERN_INDEX_TO_CALENDAR_FIELD[patternCharIndex];
             var value;
             if (field == 17) {
-                patternCharIndex = global.DateFormatSymbols.PATTERN_YEAR;
+                patternCharIndex = DateFormatSymbols.PATTERN_YEAR;
                 field = _PATTERN_INDEX_TO_CALENDAR_FIELD[patternCharIndex];
-                value = global.CalendarHelper.getField( _date, field );
+                value = CalendarHelper.getField( _date, field );
             } else if (field == 1000) {
-                value = global.CalendarHelper.toISODayOfWeek(CalendarHelper.getField( _date, 7 ));
+                value = CalendarHelper.toISODayOfWeek(CalendarHelper.getField( _date, 7 ));
             } else {
                 value = CalendarHelper.getField( _date, field );
             }
@@ -186,7 +198,7 @@
             // zeroPaddingNumber() must be fixed.
 
             switch (patternCharIndex) {
-                case global.DateFormatSymbols.PATTERN_ERA: // 'G'
+                case DateFormatSymbols.PATTERN_ERA: // 'G'
                     if (useDateFormatSymbols) {
                         var eras = _formatData.getEras();
                         if (value < eras.length)
@@ -196,15 +208,15 @@
                         current = "";
                     break;
 
-                case global.DateFormatSymbols.PATTERN_WEEK_YEAR: // 'Y'
-                case global.DateFormatSymbols.PATTERN_YEAR:      // 'y'
+                case DateFormatSymbols.PATTERN_WEEK_YEAR: // 'Y'
+                case DateFormatSymbols.PATTERN_YEAR:      // 'y'
                     if (count != 2)
                         buffer = _zeroPaddingNumber(value, count, maxIntCount, buffer);
                     else // count == 2
                         buffer = _zeroPaddingNumber(value, 2, 2, buffer); // clip 1996 to 96
                     break;
 
-                case global.DateFormatSymbols.PATTERN_MONTH: // 'M'
+                case DateFormatSymbols.PATTERN_MONTH: // 'M'
                     if (useDateFormatSymbols) {
                         var months;
                         if (count >= 4) {
@@ -224,7 +236,7 @@
                     }
                     break;
 
-                case global.DateFormatSymbols.PATTERN_HOUR_OF_DAY1: // 'k' 1-based.  eg, 23:59 + 1 hour =>> 24:59
+                case DateFormatSymbols.PATTERN_HOUR_OF_DAY1: // 'k' 1-based.  eg, 23:59 + 1 hour =>> 24:59
                     if (current == null) {
                         if (value == 0)
                             buffer = _zeroPaddingNumber(CalendarHelper.getField( _date, 11 ) + 24,
@@ -234,7 +246,7 @@
                     }
                     break;
 
-                case global.DateFormatSymbols.PATTERN_DAY_OF_WEEK: // 'E'
+                case DateFormatSymbols.PATTERN_DAY_OF_WEEK: // 'E'
                     if (useDateFormatSymbols) {
                         var weekdays;
                         if (count >= 4) {
@@ -247,14 +259,14 @@
                     }
                     break;
 
-                case global.DateFormatSymbols.PATTERN_AM_PM:    // 'a'
+                case DateFormatSymbols.PATTERN_AM_PM:    // 'a'
                     if (useDateFormatSymbols) {
                         var ampm = _formatData.getAmPmStrings();
                         current = ampm[value];
                     }
                     break;
 
-                case global.DateFormatSymbols.PATTERN_HOUR1:    // 'h' 1-based.  eg, 11PM + 1 hour =>> 12 AM
+                case DateFormatSymbols.PATTERN_HOUR1:    // 'h' 1-based.  eg, 11PM + 1 hour =>> 12 AM
                     if (current == null) {
                         if (value == 0)
                             buffer = _zeroPaddingNumber(CalendarHelper.getField( _date, 10 ) + 12,
@@ -265,7 +277,7 @@
                     break;
 
                 // TODO: Use time zones
-                /*case global.DateFormatSymbols.PATTERN_ZONE_NAME: // 'z'
+                /*case DateFormatSymbols.PATTERN_ZONE_NAME: // 'z'
                     if (current == null) {
                         if (formatData.locale == null || formatData.isZoneStringsSet) {
                             int zoneIndex =
@@ -292,7 +304,7 @@
                     }
                     break;*/
 
-                case global.DateFormatSymbols.PATTERN_ZONE_VALUE: // 'Z' ("-/+hhmm" form)
+                case DateFormatSymbols.PATTERN_ZONE_VALUE: // 'Z' ("-/+hhmm" form)
                     value = -CalendarHelper.getField( _date, 15 );
 
                     var width = 4;
@@ -306,7 +318,7 @@
                     buffer = CalendarHelper.sprintf0d(buffer, num, width);
                     break;
 
-                case global.DateFormatSymbols.PATTERN_ISO_ZONE:   // 'X'
+                case DateFormatSymbols.PATTERN_ISO_ZONE:   // 'X'
                     value = -CalendarHelper.getField( _date, 15 );
 
                     if (value == 0) {
@@ -355,10 +367,10 @@
                 buffer += current;
             }
 
-            /*var fieldID = _PATTERN_INDEX_TO_DATE_FORMAT_FIELD[patternCharIndex];
+            var fieldID = _PATTERN_INDEX_TO_DATE_FORMAT_FIELD[patternCharIndex];
             var f = _PATTERN_INDEX_TO_DATE_FORMAT_FIELD_ID[patternCharIndex];
 
-            delegate.formatted(fieldID, f, f, beginOffset, buffer.length(), buffer);*/
+            delegate.formatted(fieldID, f, f, beginOffset, buffer.length, buffer);
             return buffer;
         };
 
@@ -427,7 +439,7 @@
             }
             if (bestMatch >= 0)
             {
-                global.CalendarHelper.setField(date, field, bestMatch);
+                CalendarHelper.setField(date, field, bestMatch);
                 return start + bestMatchLength;
             }
             return -start;
@@ -497,11 +509,11 @@
             obeyCount, ambiguousYear, origPos, useFollowingMinusSignAsDelimiter, date) {
             var number = null;
             var value = 0;
-            var pos = new global.ParsePosition(0);
+            var pos = new ParsePosition(0);
             pos.index = start;
-            if (patternCharIndex == global.DateFormatSymbols.PATTERN_WEEK_YEAR) {
+            if (patternCharIndex == DateFormatSymbols.PATTERN_WEEK_YEAR) {
                 // use calendar year 'y' instead
-                patternCharIndex = global.DateFormatSymbols.PATTERN_YEAR;
+                patternCharIndex = DateFormatSymbols.PATTERN_YEAR;
             }
             var field = _PATTERN_INDEX_TO_CALENDAR_FIELD[patternCharIndex];
 
@@ -523,11 +535,11 @@
                 // a number value.  We handle further, more generic cases below.  We need
                 // to handle some of them here because some fields require extra processing on
                 // the parsed value.
-                if (patternCharIndex == global.DateFormatSymbols.PATTERN_HOUR_OF_DAY1 ||
-                    patternCharIndex == global.DateFormatSymbols.PATTERN_HOUR1 ||
-                    (patternCharIndex == global.DateFormatSymbols.PATTERN_MONTH && count <= 2) ||
-                    patternCharIndex == global.DateFormatSymbols.PATTERN_YEAR ||
-                    patternCharIndex == global.DateFormatSymbols.PATTERN_WEEK_YEAR) {
+                if (patternCharIndex == DateFormatSymbols.PATTERN_HOUR_OF_DAY1 ||
+                    patternCharIndex == DateFormatSymbols.PATTERN_HOUR1 ||
+                    (patternCharIndex == DateFormatSymbols.PATTERN_MONTH && count <= 2) ||
+                    patternCharIndex == DateFormatSymbols.PATTERN_YEAR ||
+                    patternCharIndex == DateFormatSymbols.PATTERN_WEEK_YEAR) {
                     // It would be good to unify this with the obeyCount logic below,
                     // but that's going to be difficult.
                     if (obeyCount) {
@@ -539,7 +551,7 @@
                         number = _numberFormat.parse(text, pos);
                     }
                     if (number == null) {
-                        if (patternCharIndex != global.DateFormatSymbols.PATTERN_YEAR) {
+                        if (patternCharIndex != DateFormatSymbols.PATTERN_YEAR) {
                             break parsing;
                         }
                     } else {
@@ -560,7 +572,7 @@
 
                 var index;
                 switch (patternCharIndex) {
-                    case global.DateFormatSymbols.PATTERN_ERA: // 'G'
+                    case DateFormatSymbols.PATTERN_ERA: // 'G'
                         if (useDateFormatSymbols) {
                             if ((index = _matchString(text, start, 0, _formatData.getEras(), date)) > 0) {
                                 return index;
@@ -575,8 +587,8 @@
                         }
                         break parsing;
 
-                    case global.DateFormatSymbols.PATTERN_WEEK_YEAR: // 'Y'
-                    case global.DateFormatSymbols.PATTERN_YEAR:      // 'y'
+                    case DateFormatSymbols.PATTERN_WEEK_YEAR: // 'Y'
+                    case DateFormatSymbols.PATTERN_YEAR:      // 'y'
                         /*if (!(calendar instanceof GregorianCalendar)) {
                             // calendar might have text representations for year values,
                             // such as "\u5143" in JapaneseImperialCalendar.
@@ -616,13 +628,13 @@
                         date.setFullYear(value);
                         return pos.index;
 
-                    case global.DateFormatSymbols.PATTERN_MONTH: // 'M'
+                    case DateFormatSymbols.PATTERN_MONTH: // 'M'
                         if (count <= 2) // i.e., M or MM.
                         {
                             // Don't want to parse the month if it is a string
                             // while pattern uses numeric style: M or MM.
                             // [We computed 'value' above.]
-                            global.CalendarHelper.setField(date, 2, value - 1);
+                            CalendarHelper.setField(date, 2, value - 1);
                             return pos.index;
                         }
 
@@ -650,7 +662,7 @@
                         }
                         break parsing;
 
-                    case global.DateFormatSymbols.PATTERN_HOUR_OF_DAY1: // 'k' 1-based.  eg, 23:59 + 1 hour =>> 24:59
+                    case DateFormatSymbols.PATTERN_HOUR_OF_DAY1: // 'k' 1-based.  eg, 23:59 + 1 hour =>> 24:59
                         /*if (!isLenient()) {
                             // Validate the hour value in non-lenient
                             if (value < 1 || value > 24) {
@@ -660,10 +672,10 @@
                         // [We computed 'value' above.]
                         if (value == 24)
                             value = 0;
-                        global.CalendarHelper.setField(date, 11, value);
+                        CalendarHelper.setField(date, 11, value);
                         return pos.index;
 
-                    case global.DateFormatSymbols.PATTERN_DAY_OF_WEEK:  // 'E'
+                    case DateFormatSymbols.PATTERN_DAY_OF_WEEK:  // 'E'
                     {
                         if (useDateFormatSymbols) {
                             // Want to be able to parse both short and long forms.
@@ -690,7 +702,7 @@
                     }
                         break parsing;
 
-                    case global.DateFormatSymbols.PATTERN_AM_PM:    // 'a'
+                    case DateFormatSymbols.PATTERN_AM_PM:    // 'a'
                         if (useDateFormatSymbols) {
                             if ((index = _matchString(text, start, 9,
                                     _formatData.getAmPmStrings(), date)) > 0) {
@@ -704,7 +716,7 @@
                         }
                         break parsing;
 
-                    case global.DateFormatSymbols.PATTERN_HOUR1: // 'h' 1-based.  eg, 11PM + 1 hour =>> 12 AM
+                    case DateFormatSymbols.PATTERN_HOUR1: // 'h' 1-based.  eg, 11PM + 1 hour =>> 12 AM
                         /*if (!isLenient()) {
                             // Validate the hour value in non-lenient
                             if (value < 1 || value > 12) {
@@ -714,11 +726,11 @@
                         // [We computed 'value' above.]
                         if (value == 12)
                             value = 0;
-                        global.CalendarHelper.setField(date, 10, value);
+                        CalendarHelper.setField(date, 10, value);
                         return pos.index;
 
-                    case global.DateFormatSymbols.PATTERN_ZONE_NAME:  // 'z'
-                    case global.DateFormatSymbols.PATTERN_ZONE_VALUE: // 'Z'
+                    case DateFormatSymbols.PATTERN_ZONE_NAME:  // 'z'
+                    case DateFormatSymbols.PATTERN_ZONE_VALUE: // 'Z'
                         {
                             var sign = 0;
                             try {
@@ -780,7 +792,7 @@
                         }
                         break parsing;
 
-                    case global.DateFormatSymbols.PATTERN_ISO_ZONE:   // 'X'
+                    case DateFormatSymbols.PATTERN_ISO_ZONE:   // 'X'
                     {
                         if ((text.length - pos.index) <= 0) {
                             break parsing;
@@ -845,7 +857,7 @@
                                 pos.index--;
                             }
 
-                            global.CalendarHelper.setField(date, field, value);
+                            CalendarHelper.setField(date, field, value);
                             return pos.index;
                         }
                         break parsing;
@@ -920,16 +932,16 @@
             if ( arguments.length > 0 && arguments.length <= 2 ) {
                 var pattern = arguments[ 0 ];
                 if ( arguments.length == 1 ) {
-                    _locale = global.Locale.getDefault();
-                    _formatData = new global.DateFormatSymbols( _locale );
+                    _locale = Locale.getDefault();
+                    _formatData = new DateFormatSymbols( _locale );
                 } else if ( arguments.length == 2 ) {
                     var arg1 = arguments[ 1 ];
-                    if ( arg1 instanceof global.Locale ) {
+                    if ( arg1 instanceof Locale ) {
                         _locale = arg1;
-                        _formatData = new global.DateFormatSymbols( _locale );
-                    } else if ( arg1 instanceof global.DateFormatSymbols) {
+                        _formatData = new DateFormatSymbols( _locale );
+                    } else if ( arg1 instanceof DateFormatSymbols) {
                         _formatData = arg1;
-                        _locale = global.Locale.getDefault();
+                        _locale = Locale.getDefault();
                         _useDateFormatSymbols = true;
                     }
                 }
@@ -938,18 +950,18 @@
                 _initialize( _locale );
             } else {
                 var timeStyle = arguments.length > 0 && typeof arguments[ 0 ] != "undefined" ?
-                    arguments[ 0 ] : global.DateFormat.SHORT;
+                    arguments[ 0 ] : DateFormat.SHORT;
                 var dateStyle = arguments.length > 0 && typeof arguments[ 1 ] != "undefined" ?
-                    arguments[ 1 ] : global.DateFormat.SHORT;
+                    arguments[ 1 ] : DateFormat.SHORT;
                 var loc = arguments.length > 0 && typeof arguments[ 2 ] != "undefined" ?
-                    arguments[ 2 ] : global.Locale.getDefault();
+                    arguments[ 2 ] : Locale.getDefault();
                 _locale = loc;
                 // initialize calendar and related fields
                 _initializeCalendar( loc );
 
-                var r = global.ResourceBundle.getBundle( "FormatData", loc );
+                var r = ResourceBundle.getBundle( "FormatData", loc );
                 var dateTimePatterns = r[ "DateTimePatterns" ];
-                _formatData = new global.DateFormatSymbols( loc );
+                _formatData = new DateFormatSymbols( loc );
                 if ( ( timeStyle >= 0 ) && ( dateStyle >= 0 ) ) {
                     var dateTimeArgs = [ dateTimePatterns[ timeStyle ],
                         dateTimePatterns[ dateStyle + 4 ] ];
@@ -985,8 +997,11 @@
             return new Date( _defaultCenturyStart.getTime() );
         };
 
-        this.format = function( date, toAppendTo ) {
+        this.format = function( date, toAppendTo, pos ) {
             toAppendTo = typeof toAppendTo == "string" ? toAppendTo : "";
+            pos = pos && pos instanceof FieldPosition ? pos : new FieldPosition( 0 );
+            pos.beginIndex = pos.endIndex = 0;
+            var delegate = pos.getFieldDelegate();
             // Convert input date to time field list
             _date = date;
 
@@ -1011,7 +1026,7 @@
                     break;
 
                 default:
-                    toAppendTo = _subFormat( tag, count, toAppendTo, useDateFormatSymbols );
+                    toAppendTo = _subFormat( tag, count, delegate, toAppendTo, useDateFormatSymbols );
                     break;
                 }
             }
@@ -1019,7 +1034,7 @@
         };
 
         this.parse = function( text, pos ) {
-            pos = pos || new global.ParsePosition( 0 );
+            pos = pos || new ParsePosition( 0 );
             _checkNegativeNumberExpression();
 
             var start = pos.index;
@@ -1207,58 +1222,58 @@
 
     // Map index into pattern character string to DateFormat field number
     var _PATTERN_INDEX_TO_DATE_FORMAT_FIELD = [
-        global.DateFormat.ERA_FIELD,
-        global.DateFormat.YEAR_FIELD,
-        global.DateFormat.MONTH_FIELD,
-        global.DateFormat.DATE_FIELD,
-        global.DateFormat.HOUR_OF_DAY1_FIELD,
-        global.DateFormat.HOUR_OF_DAY0_FIELD,
-        global.DateFormat.MINUTE_FIELD,
-        global.DateFormat.SECOND_FIELD,
-        global.DateFormat.MILLISECOND_FIELD,
-        global.DateFormat.DAY_OF_WEEK_FIELD,
-        global.DateFormat.DAY_OF_YEAR_FIELD,
-        global.DateFormat.DAY_OF_WEEK_IN_MONTH_FIELD,
-        global.DateFormat.WEEK_OF_YEAR_FIELD,
-        global.DateFormat.WEEK_OF_MONTH_FIELD,
-        global.DateFormat.AM_PM_FIELD,
-        global.DateFormat.HOUR1_FIELD,
-        global.DateFormat.HOUR0_FIELD,
-        global.DateFormat.TIMEZONE_FIELD,
-        global.DateFormat.TIMEZONE_FIELD,
-        global.DateFormat.YEAR_FIELD,
-        global.DateFormat.DAY_OF_WEEK_FIELD,
-        global.DateFormat.TIMEZONE_FIELD
+        DateFormat.ERA_FIELD,
+        DateFormat.YEAR_FIELD,
+        DateFormat.MONTH_FIELD,
+        DateFormat.DATE_FIELD,
+        DateFormat.HOUR_OF_DAY1_FIELD,
+        DateFormat.HOUR_OF_DAY0_FIELD,
+        DateFormat.MINUTE_FIELD,
+        DateFormat.SECOND_FIELD,
+        DateFormat.MILLISECOND_FIELD,
+        DateFormat.DAY_OF_WEEK_FIELD,
+        DateFormat.DAY_OF_YEAR_FIELD,
+        DateFormat.DAY_OF_WEEK_IN_MONTH_FIELD,
+        DateFormat.WEEK_OF_YEAR_FIELD,
+        DateFormat.WEEK_OF_MONTH_FIELD,
+        DateFormat.AM_PM_FIELD,
+        DateFormat.HOUR1_FIELD,
+        DateFormat.HOUR0_FIELD,
+        DateFormat.TIMEZONE_FIELD,
+        DateFormat.TIMEZONE_FIELD,
+        DateFormat.YEAR_FIELD,
+        DateFormat.DAY_OF_WEEK_FIELD,
+        DateFormat.TIMEZONE_FIELD
     ];
 
     // Maps from DateFormatSymbols index to Field constant
     var _PATTERN_INDEX_TO_DATE_FORMAT_FIELD_ID = [
-        global.DateFormat.Field.ERA,
-        global.DateFormat.Field.YEAR,
-        global.DateFormat.Field.MONTH,
-        global.DateFormat.Field.DAY_OF_MONTH,
-        global.DateFormat.Field.HOUR_OF_DAY1,
-        global.DateFormat.Field.HOUR_OF_DAY0,
-        global.DateFormat.Field.MINUTE,
-        global.DateFormat.Field.SECOND,
-        global.DateFormat.Field.MILLISECOND,
-        global.DateFormat.Field.DAY_OF_WEEK,
-        global.DateFormat.Field.DAY_OF_YEAR,
-        global.DateFormat.Field.DAY_OF_WEEK_IN_MONTH,
-        global.DateFormat.Field.WEEK_OF_YEAR,
-        global.DateFormat.Field.WEEK_OF_MONTH,
-        global.DateFormat.Field.AM_PM,
-        global.DateFormat.Field.HOUR1,
-        global.DateFormat.Field.HOUR0,
-        global.DateFormat.Field.TIME_ZONE,
-        global.DateFormat.Field.TIME_ZONE,
-        global.DateFormat.Field.YEAR,
-        global.DateFormat.Field.DAY_OF_WEEK,
-        global.DateFormat.Field.TIME_ZONE
+        DateFormat.Field.ERA,
+        DateFormat.Field.YEAR,
+        DateFormat.Field.MONTH,
+        DateFormat.Field.DAY_OF_MONTH,
+        DateFormat.Field.HOUR_OF_DAY1,
+        DateFormat.Field.HOUR_OF_DAY0,
+        DateFormat.Field.MINUTE,
+        DateFormat.Field.SECOND,
+        DateFormat.Field.MILLISECOND,
+        DateFormat.Field.DAY_OF_WEEK,
+        DateFormat.Field.DAY_OF_YEAR,
+        DateFormat.Field.DAY_OF_WEEK_IN_MONTH,
+        DateFormat.Field.WEEK_OF_YEAR,
+        DateFormat.Field.WEEK_OF_MONTH,
+        DateFormat.Field.AM_PM,
+        DateFormat.Field.HOUR1,
+        DateFormat.Field.HOUR0,
+        DateFormat.Field.TIME_ZONE,
+        DateFormat.Field.TIME_ZONE,
+        DateFormat.Field.YEAR,
+        DateFormat.Field.DAY_OF_WEEK,
+        DateFormat.Field.TIME_ZONE
     ];
 
     var _encode = function( tag, length, buffer ) {
-        if ( tag == global.DateFormat.PATTERN_ISO_ZONE && length >= 4 ) {
+        if ( tag == DateFormat.PATTERN_ISO_ZONE && length >= 4 ) {
             throw "invalid ISO 8601 format: length=" + length;
         }
         if ( length < 255 ) {
@@ -1271,12 +1286,12 @@
         return buffer;
     };
 
-    SimpleDateFormat.prototype = Object.create( global.DateFormat.prototype );
+    SimpleDateFormat.prototype = Object.create( DateFormat.prototype );
 
     SimpleDateFormat.prototype.constructor = SimpleDateFormat;
 
     SimpleDateFormat.prototype.equals = function( that ) {
-        if ( !global.DateFormat.equals.apply( this, [ that ] ) ) return false; // super does class check
+        if ( !DateFormat.equals.apply( this, [ that ] ) ) return false; // super does class check
         if ( !( that instanceof SimpleDateFormat) ) return false;
         return ( this.toPattern() == that.toPattern()
             && this.getNumberFormat().equals( that.getNumberFormat() ) );
