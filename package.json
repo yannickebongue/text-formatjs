@@ -3,7 +3,7 @@
   "title": "Text Format JS",
   "description": "A javascript library for formatting locale-sensitive information such as dates, messages and numbers",
   "version": "0.1.9",
-  "main": "dist/text-format.js",
+  "main": "index.js",
   "keywords": [
     "text",
     "format",
@@ -29,10 +29,13 @@
     "test": "grunt test"
   },
   "bugs": "https://github.com/yannickebongue/text-formatjs/issues",
-  "dependencies": {},
+  "dependencies": {
+    "text-resources": "^0.0.2"
+  },
   "devDependencies": {
     "grunt": "1.0.1",
     "grunt-contrib-clean": "1.0.0",
+    "grunt-contrib-copy": "1.0.0",
     "grunt-contrib-qunit": "^1.2.0",
     "grunt-contrib-uglify": "2.0.0"
   }
