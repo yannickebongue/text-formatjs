@@ -1,10 +1,18 @@
-( function() {
-    var global = this;
+( function( global, factory ) {
+
+    if ( typeof module === "object" && typeof module.exports === "object" ) {
+        global.FormatData = module.require( "./format-data" );
+        module.exports = factory( global );
+    } else {
+        factory( global );
+    }
+
+} )( this, function( global ) {
 
     global.FormatData[ "es-ES" ] = {
         "NumberPatterns": [ "#,##0.###;-#,##0.###", "#,##0 \u00A4;-#,##0 \u00A4", "#,##0%" ]
     };
 
-    return global.FormatData[ "es-ES" ];
+    return global.FormatData;
 
-} )();
+} );

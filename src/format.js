@@ -1,5 +1,12 @@
-( function() {
-    var global = this;
+( function( global, factory ) {
+
+    if ( typeof module === "object" && typeof module.exports === "object" ) {
+        exports.Format = module.exports = factory( global );
+    } else {
+        factory( global );
+    }
+
+} )( this, function( global ) {
 
     function Format() {}
 
@@ -17,4 +24,4 @@
 
     return Format;
 
-} )();
+} );

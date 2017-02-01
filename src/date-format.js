@@ -1,8 +1,15 @@
-( function() {
-    var global = this;
+( function( global, factory ) {
+
+    if ( typeof module === "object" && typeof module.exports === "object" ) {
+        exports[ "DateFormat" ] = module.exports = factory( global );
+    } else {
+        factory( global );
+    }
+
+} )( this, function( global ) {
 
     function DateFormat() {
-        global.Format.call( this );
+        Format.call( this );
     }
 
     var _get = function( timeStyle, dateStyle, flags, loc ) {
@@ -21,9 +28,9 @@
             dateStyle = -1;
         }
         try {
-            return new global.SimpleDateFormat(timeStyle, dateStyle, loc);
+            return new SimpleDateFormat(timeStyle, dateStyle, loc);
         } catch ( e ) {
-            return new global.SimpleDateFormat("M/d/yy h:mm a");
+            return new SimpleDateFormat("M/d/yy h:mm a");
         }
     };
 
@@ -54,38 +61,38 @@
 
     DateFormat.getTimeInstance = function( style, locale ) {
         return _get( ( typeof style != "undefined" ? style : DateFormat.DEFAULT ), 0,
-            1, locale || global.Locale.getDefault() );
+            1, locale || Locale.getDefault() );
     };
 
     DateFormat.getDateInstance = function( style, locale ) {
         return _get( 0, ( typeof style != "undefined" ? style : DateFormat.DEFAULT ),
-            2, locale || global.Locale.getDefault() );
+            2, locale || Locale.getDefault() );
     };
 
     DateFormat.getDateTimeInstance = function( dateStyle, timeStyle, locale ) {
         return _get( ( typeof timeStyle != "undefined" ? timeStyle : DateFormat.DEFAULT ),
             ( typeof dateStyle != "undefined" ? dateStyle : DateFormat.DEFAULT ),
-            3, locale || global.Locale.getDefault() );
+            3, locale || Locale.getDefault() );
     };
 
     DateFormat.getInstance = function() {
         return DateFormat.getDateTimeInstance( DateFormat.SHORT, DateFormat.SHORT );
     };
 
-    DateFormat.prototype = Object.create( global.Format.prototype );
+    DateFormat.prototype = Object.create( Format.prototype );
 
     DateFormat.prototype.constructor = DateFormat;
 
     DateFormat.prototype.equals = function( other ) {
         if (this == other) return true;
-        return other && other instanceof DecimalFormatSymbols;
+        return other && other instanceof DateFormat;
     };
 
     DateFormat.Field = function Field( name ) {
-        global.Format.Field.call( this, name );
+        Format.Field.call( this, name );
     };
 
-    DateFormat.Field.prototype = Object.create( global.Format.Field.prototype );
+    DateFormat.Field.prototype = Object.create( Format.Field.prototype );
 
     DateFormat.Field.prototype.constructor = DateFormat.Field;
 
@@ -112,4 +119,4 @@
 
     return DateFormat;
 
-} )();
+} );

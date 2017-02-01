@@ -1,5 +1,12 @@
-( function() {
-    var global = this;
+( function( global, factory ) {
+
+    if ( typeof module === "object" && typeof module.exports === "object" ) {
+        exports[ "DateFormatSymbols" ] = module.exports = factory( global );
+    } else {
+        factory( global );
+    }
+
+} )( this, function( global ) {
 
     function DateFormatSymbols( locale ) {
         var _eras = null;
@@ -16,7 +23,7 @@
             _locale = desiredLocale;
 
             // Initialize the fields from the ResourceBundle for locale.
-            var resource = global.ResourceBundle.getBundle( "FormatData", desiredLocale );
+            var resource = ResourceBundle.getBundle( "FormatData", desiredLocale );
 
             _eras = resource[ "Eras" ];
             _months = resource[ "MonthNames" ];
@@ -102,7 +109,7 @@
             _localPatternChars = newLocalPatternChars.toString();
         };
 
-        _initializeData( locale || global.Locale.getDefault() );
+        _initializeData( locale || Locale.getDefault() );
     }
 
     var _toOneBasedArray = function( src ) {
@@ -152,4 +159,4 @@
 
     return DateFormatSymbols;
 
-} )();
+} );

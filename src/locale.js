@@ -1,5 +1,12 @@
-( function() {
-    var global = this;
+( function( global, factory ) {
+
+    if ( typeof module === "object" && typeof module.exports === "object" ) {
+        exports.Locale = module.exports = factory( global );
+    } else {
+        factory( global );
+    }
+
+} )( this, function( global ) {
 
     function Locale( language, country, variant ) {
         var _DISPLAY_LANGUAGE = 0;
@@ -16,7 +23,7 @@
                 return "";
             }
 
-            var bundle = global.ResourceBundle.getBundle( "LocaleNames", inLocale );
+            var bundle = ResourceBundle.getBundle( "LocaleNames", inLocale );
             var key = type == _DISPLAY_VARIANT ? "%%" + code : code;
             var result = null;
 
@@ -86,7 +93,7 @@
                 return "";
             }
 
-            var bundle = global.ResourceBundle.getBundle( "LocaleNames", inLocale );
+            var bundle = ResourceBundle.getBundle( "LocaleNames", inLocale );
 
             var names = _getDisplayVariantArray( bundle, inLocale );
 
@@ -103,7 +110,7 @@
         };
 
         this.getDisplayName = function( inLocale ) {
-            var bundle = global.ResourceBundle.getBundle( "LocaleNames", inLocale );
+            var bundle = ResourceBundle.getBundle( "LocaleNames", inLocale );
 
             var languageName = this.getDisplayLanguage(inLocale);
             // var scriptName = this.getDisplayScript(inLocale);
@@ -323,4 +330,4 @@
 
     return Locale;
 
-} )();
+} );

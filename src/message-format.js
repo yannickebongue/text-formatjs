@@ -1,15 +1,12 @@
-(function() {
-    var global = this;
+( function( global, factory ) {
 
-    var ChoiceFormat = global.ChoiceFormat;
-    var DateFormat = global.DateFormat;
-    var DecimalFormat = global.DecimalFormat;
-    var DecimalFormatSymbols = global.DecimalFormatSymbols;
-    var Format = global.Format;
-    var Locale = global.Locale;
-    var NumberFormat = global.NumberFormat;
-    var ParsePosition = global.ParsePosition;
-    var SimpleDateFormat = global.SimpleDateFormat;
+    if ( typeof module === "object" && typeof module.exports === "object" ) {
+        exports[ "MessageFormat" ] = module.exports = factory( global );
+    } else {
+        factory( global );
+    }
+
+} )( this, function( global ) {
 
     var MessageFormat = function MessageFormat(pattern) {
         Format.call(this);
@@ -136,7 +133,8 @@
             _formats[offsetNumber] = newFormat;
         };
 
-        var _subformat = function(arguments, result) {
+        var _subformat = function(arguments, result, fp) {
+            fp = fp && fp instanceof FieldPosition ? fp : new FieldPosition( 0 );
             // note: this implementation assumes a fast substring & index.
             // if this is not true, would be better to append chars one by one.
             var lastOffset = 0;
@@ -193,11 +191,10 @@
                     }
                     last = result.length;
                     result += arg;
-                    /*if (i == 0 && fp != null && Field.ARGUMENT.equals(
-                         fp.getFieldAttribute())) {
-                         fp.setBeginIndex(last);
-                         fp.setEndIndex(result.length());
-                     }*/
+                    if (i == 0 && fp != null && MessageFormat.Field.ARGUMENT == fp.attribute) {
+                         fp.beginIndex = last;
+                         fp.endIndex = result.length;
+                     }
                     last = result.length;
                 }
             }
@@ -636,4 +633,4 @@
 
     return MessageFormat;
 
-})();
+});

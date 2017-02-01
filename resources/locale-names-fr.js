@@ -1,5 +1,13 @@
-( function() {
-    var global = this;
+( function( global, factory ) {
+
+    if ( typeof module === "object" && typeof module.exports === "object" ) {
+        global.LocaleNames = module.require( "./locale-names" );
+        module.exports = factory( global );
+    } else {
+        factory( global );
+    }
+
+} )( this, function( global ) {
 
     global.LocaleNames[ "fr" ] = {
         "001": "Monde",
@@ -1095,6 +1103,6 @@
         "zza": "Zazaki"
     };
 
-    return global.LocaleNames[ "fr" ];
+    return global.LocaleNames;
 
-} )();
+} );
