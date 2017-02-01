@@ -1,5 +1,13 @@
-( function() {
-    var global = this;
+( function( global, factory ) {
+
+    if ( typeof module === "object" && typeof module.exports === "object" ) {
+        global.FormatData = module.require( "./format-data" );
+        module.exports = factory( global );
+    } else {
+        factory( global );
+    }
+
+} )( this, function( global ) {
 
     global.FormatData[ "it" ] = {
         "MonthNames": [ "gennaio", "febbraio", "marzo", "aprile", "maggio",
@@ -18,6 +26,6 @@
         "DateTimePatternChars": "GyMdkHmsSEDFwWahKzZ"
     };
 
-    return global.FormatData[ "it" ];
+    return global.FormatData;
 
-} )();
+} );
