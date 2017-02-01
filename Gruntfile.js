@@ -57,6 +57,17 @@ module.exports = function( grunt ) {
             }
         },
 
+        npmcopy: {
+            external: {
+                options: {
+                    destPrefix: "external/"
+                },
+                files: {
+                    "text-resources": "text-resources/dist/**/*.js"
+                }
+            }
+        },
+
         uglify: {
             options: {
                 mangle: {
@@ -113,6 +124,7 @@ module.exports = function( grunt ) {
     grunt.loadNpmTasks( "grunt-contrib-copy" );
     grunt.loadNpmTasks( "grunt-contrib-uglify" );
     grunt.loadNpmTasks( "grunt-contrib-qunit" );
+    grunt.loadNpmTasks( "grunt-npmcopy" );
 
     grunt.registerTask( "default", [ "clean", "copy", "uglify:main", "uglify:dist" ] );
     grunt.registerTask( "test", [ "qunit" ] );
