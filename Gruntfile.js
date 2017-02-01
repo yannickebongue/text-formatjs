@@ -39,22 +39,6 @@ module.exports = function( grunt ) {
         return "src/" + file;
     } );
 
-    var resourceDir = "resources/";
-    var resourceNames = [
-        "currency-names",
-        "format-data",
-        "locale-names"
-    ];
-
-    var resourceFiles = [];
-    resourceNames.forEach( function( baseName ) {
-        var pattern = resourceDir + baseName + "-*.js";
-        resourceFiles.push( resourceDir + baseName + ".js" );
-        resourceFiles = resourceFiles.concat( grunt.file.expandMapping( pattern ).map( function( item ) {
-            return item.dest;
-        } ) );
-    } );
-
     grunt.initConfig( {
 
         pkg: grunt.file.readJSON( "package.json" ),
@@ -106,8 +90,7 @@ module.exports = function( grunt ) {
                     preserveComments: "all"
                 },
                 files: {
-                    "dist/text-format.js": sourceFiles,
-                    "dist/text-resources.js": resourceFiles
+                    "dist/text-format.js": sourceFiles
                 }
             },
             dist: {
@@ -115,8 +98,7 @@ module.exports = function( grunt ) {
                     sourceMap: true
                 },
                 files: {
-                    "dist/text-format.min.js": "dist/text-format.js",
-                    "dist/text-resources.min.js": "dist/text-resources.js"
+                    "dist/text-format.min.js": "dist/text-format.js"
                 }
             }
         },
