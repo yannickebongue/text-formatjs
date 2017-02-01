@@ -1,8 +1,15 @@
-( function() {
-    var global = this;
+( function( global, factory ) {
+
+    if ( typeof module === "object" && typeof module.exports === "object" ) {
+        exports[ "NumberFormat" ] = module.exports = factory( global );
+    } else {
+        factory( global );
+    }
+
+} )( this, function( global ) {
 
     function NumberFormat() {
-        global.Format.call( this );
+        Format.call( this );
 
         var _groupingUsed = true;
         var _maximumIntegerDigits = 40;
@@ -73,12 +80,12 @@
     var _INTEGERSTYLE = 4;
 
     var _getInstance = function( desiredLocale, choice ) {
-        var resource = global.ResourceBundle.getBundle( "FormatData", desiredLocale );
+        var resource = ResourceBundle.getBundle( "FormatData", desiredLocale );
         var numberPatterns = resource[ "NumberPatterns" ];
 
-        var symbols = new global.DecimalFormatSymbols( desiredLocale );
+        var symbols = new DecimalFormatSymbols( desiredLocale );
         var entry = ( choice == _INTEGERSTYLE ) ? _NUMBERSTYLE : choice;
-        var format = new global.DecimalFormat( numberPatterns[ entry ], symbols );
+        var format = new DecimalFormat( numberPatterns[ entry ], symbols );
 
         if ( choice == _INTEGERSTYLE ) {
             format.setMaximumFractionDigits( 0 );
@@ -95,26 +102,26 @@
     NumberFormat.FRACTION_FIELD = 1;
 
     NumberFormat.getInstance = function( inLocale ) {
-        return _getInstance( inLocale || global.Locale.getDefault(), _NUMBERSTYLE );
+        return _getInstance( inLocale || Locale.getDefault(), _NUMBERSTYLE );
     };
 
     NumberFormat.getNumberInstance = function( inLocale ) {
-        return _getInstance( inLocale || global.Locale.getDefault(), _NUMBERSTYLE );
+        return _getInstance( inLocale || Locale.getDefault(), _NUMBERSTYLE );
     };
 
     NumberFormat.getIntegerInstance = function( inLocale ) {
-        return _getInstance( inLocale || global.Locale.getDefault(), _INTEGERSTYLE );
+        return _getInstance( inLocale || Locale.getDefault(), _INTEGERSTYLE );
     };
 
     NumberFormat.getCurrencyInstance = function( inLocale ) {
-        return _getInstance( inLocale || global.Locale.getDefault(), _CURRENCYSTYLE );
+        return _getInstance( inLocale || Locale.getDefault(), _CURRENCYSTYLE );
     };
 
     NumberFormat.getPercentInstance = function( inLocale ) {
-        return _getInstance( inLocale || global.Locale.getDefault(), _PERCENTSTYLE );
+        return _getInstance( inLocale || Locale.getDefault(), _PERCENTSTYLE );
     };
 
-    NumberFormat.prototype = Object.create( global.Format.prototype );
+    NumberFormat.prototype = Object.create( Format.prototype );
 
     NumberFormat.prototype.constructor = NumberFormat;
 
@@ -137,10 +144,10 @@
     };
 
     NumberFormat.Field = function Field( name ) {
-        global.Format.Field.call( this, name );
+        Format.Field.call( this, name );
     };
 
-    NumberFormat.Field.prototype = Object.create( global.Format.Field.prototype );
+    NumberFormat.Field.prototype = Object.create( Format.Field.prototype );
 
     NumberFormat.Field.prototype.constructor = NumberFormat.Field;
 
@@ -160,4 +167,4 @@
 
     return NumberFormat;
 
-} )();
+} );

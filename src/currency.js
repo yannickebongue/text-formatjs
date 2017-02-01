@@ -1,5 +1,14 @@
-( function() {
-    var global = this;
+( function( global, factory ) {
+
+    if ( typeof module === "object" && typeof module.exports === "object" ) {
+        global.CurrencyData = module.require( "./currency-data" );
+        exports.Currency = module.exports = factory( global );
+    } else {
+        factory( global );
+    }
+
+} )( this, function( global ) {
+    var CurrencyData = global.CurrencyData;
 
     function Currency( currencyCode, defaultFractionDigits, numericCode ) {
         var _currencyCode = currencyCode;
@@ -19,12 +28,12 @@
         };
 
         this.getSymbol = function( locale ) {
-            var bundle = global.ResourceBundle.getBundle( "CurrencyNames", locale );
+            var bundle = ResourceBundle.getBundle( "CurrencyNames", locale );
             return bundle[ _currencyCode ];
         };
 
         this.getDisplayName = function( locale ) {
-            var bundle = global.ResourceBundle.getBundle( "CurrencyNames", locale );
+            var bundle = ResourceBundle.getBundle( "CurrencyNames", locale );
             return bundle[ _currencyCode.toLowerCase() ];
         };
     }
@@ -36,7 +45,7 @@
             var currencyCode = arg.length > 0 ? arg : "XXX" ;
             var instance = instances[ currencyCode ];
             if ( !instance ) {
-                var data = global.CurrencyData;
+                var data = CurrencyData;
                 var numericCode = 0;
                 var defaultFractionDigit = -1;
                 var result = new RegExp( currencyCode + "\\d{3}" ).exec( data["all"] ).toString();
@@ -63,11 +72,11 @@
                 }
             }
             return instance;
-        } else if ( arg instanceof global.Locale ) {
+        } else if ( arg instanceof Locale ) {
             var locale = arg;
             var countryCode = locale.getCountry();
             if ( countryCode && countryCode.length > 0 ) {
-                return Currency.getInstance( global.CurrencyData[ countryCode ] );
+                return Currency.getInstance( CurrencyData[ countryCode ] );
             } else {
                 return new Currency( "XXX", -1, 0 );
             }
@@ -84,4 +93,4 @@
 
     return Currency;
 
-} )();
+} );

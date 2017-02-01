@@ -1,7 +1,12 @@
-( function() {
-    var global = this;
-    var NumberFormat = global.NumberFormat;
-    var ParsePosition = global.ParsePosition;
+( function( global, factory ) {
+
+    if ( typeof module === "object" && typeof module.exports === "object" ) {
+        exports[ "ChoiceFormat" ] = module.exports = factory( global );
+    } else {
+        factory( global );
+    }
+
+} )( this, function( global ) {
 
     function ChoiceFormat( newPattern ) {
         NumberFormat.call( this );
@@ -227,4 +232,4 @@
 
     return ChoiceFormat;
 
-} )();
+} );
