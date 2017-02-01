@@ -1,5 +1,12 @@
-( function() {
-    var global = this;
+( function( global, factory ) {
+
+    if ( typeof module === "object" && typeof module.exports === "object" ) {
+        exports[ "FieldPosition" ] = module.exports = factory( global );
+    } else {
+        factory( global );
+    }
+
+} )( this, function( global ) {
 
     function FieldPosition( arg ) {
         var _this = this;
@@ -8,7 +15,7 @@
         this.beginIndex = 0;
         this.endIndex = 0;
         this.attribute = null;
-        if ( arg instanceof global.Format.Field ) {
+        if ( arg instanceof Format.Field ) {
             this.attribute = arg;
             if ( arguments.length > 1 ) {
                 if ( typeof arguments[ 1 ] == "number" ) {
@@ -69,4 +76,4 @@
 
     return FieldPosition;
 
-} )();
+} );

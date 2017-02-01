@@ -1,16 +1,12 @@
-(function() {
-    var global = this;
+( function( global, factory ) {
 
-    var ChoiceFormat = global.ChoiceFormat;
-    var DateFormat = global.DateFormat;
-    var DecimalFormat = global.DecimalFormat;
-    var DecimalFormatSymbols = global.DecimalFormatSymbols;
-    var FieldPosition = global.FieldPosition;
-    var Format = global.Format;
-    var Locale = global.Locale;
-    var NumberFormat = global.NumberFormat;
-    var ParsePosition = global.ParsePosition;
-    var SimpleDateFormat = global.SimpleDateFormat;
+    if ( typeof module === "object" && typeof module.exports === "object" ) {
+        exports[ "MessageFormat" ] = module.exports = factory( global );
+    } else {
+        factory( global );
+    }
+
+} )( this, function( global ) {
 
     var MessageFormat = function MessageFormat(pattern) {
         Format.call(this);
@@ -637,4 +633,4 @@
 
     return MessageFormat;
 
-})();
+});

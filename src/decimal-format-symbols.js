@@ -1,5 +1,12 @@
-( function() {
-    var global = this;
+( function( global, factory ) {
+
+    if ( typeof module === "object" && typeof module.exports === "object" ) {
+        exports[ "DecimalFormatSymbols" ] = module.exports = factory( global );
+    } else {
+        factory( global );
+    }
+
+} )( this, function( global ) {
 
     function DecimalFormatSymbols( locale ) {
         var _zeroDigit = null;
@@ -21,7 +28,7 @@
         var _currency = null;
 
         var _initialize = function( locale ) {
-            var rb = global.ResourceBundle.getBundle( "FormatData", locale );
+            var rb = ResourceBundle.getBundle( "FormatData", locale );
             var numberElements = rb[ "NumberElements" ];
 
             _decimalSeparator = numberElements[ 0 ];
@@ -38,14 +45,14 @@
             _NaN = numberElements[ 10 ];
 
             if ( locale.getCountry().length > 0 ) {
-                _currency = global.Currency.getInstance( locale );
+                _currency = Currency.getInstance( locale );
             }
             if ( _currency != null ) {
                 _intlCurrencySymbol = _currency.getCurrencyCode();
                 _currencySymbol = _currency.getSymbol( locale );
             } else {
                 _intlCurrencySymbol = "XXX";
-                _currency = global.Currency.getInstance( _intlCurrencySymbol );
+                _currency = Currency.getInstance( _intlCurrencySymbol );
                 _currencySymbol = "\u00A4";
             }
 
@@ -149,7 +156,7 @@
             _intlCurrencySymbol = currencyCode;
             _currency = null;
             if ( currencyCode ) {
-                _currency = global.Currency.getInstance( currencyCode );
+                _currency = Currency.getInstance( currencyCode );
             }
         };
 
@@ -189,7 +196,7 @@
             _exponentialSeparator = separator;
         };
 
-        _initialize( locale || global.Locale.getDefault() );
+        _initialize( locale || Locale.getDefault() );
     }
 
     DecimalFormatSymbols.prototype.equals = function( other ) {
@@ -217,4 +224,4 @@
 
     return DecimalFormatSymbols;
 
-} )();
+} );

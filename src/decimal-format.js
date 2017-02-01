@@ -1,12 +1,14 @@
-( function() {
-    var global = this;
-    var NumberFormat = global.NumberFormat;
-    var DecimalFormatSymbols = global.DecimalFormatSymbols;
+( function( global, factory ) {
+
+    if ( typeof module === "object" && typeof module.exports === "object" ) {
+        global.DigitList = module.require( "./digit-list" );
+        exports[ "DecimalFormat" ] = module.exports = factory( global );
+    } else {
+        factory( global );
+    }
+
+} )( this, function( global ) {
     var DigitList = global.DigitList;
-    var FieldPosition = global.FieldPosition;
-    var ParsePosition = global.ParsePosition;
-    var Locale = global.Locale;
-    var ResourceBundle = global.ResourceBundle;
 
     function DecimalFormat( pattern, symbols ) {
         NumberFormat.call( this );
@@ -1575,4 +1577,4 @@
 
     return DecimalFormat;
 
-} )();
+} );

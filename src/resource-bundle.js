@@ -1,11 +1,22 @@
-( function() {
-    var global = this;
+( function( global, factory ) {
+
+    if ( typeof module === "object" && typeof module.exports === "object" ) {
+        require( "text-resources" );
+        global.CurrencyNames = CurrencyNames;
+        global.FormatData = FormatData;
+        global.LocaleNames = LocaleNames;
+        exports.ResourceBundle = module.exports = factory( global );
+    } else {
+        factory( global );
+    }
+
+} )( this, function( global ) {
 
     function ResourceBundle() {
     }
 
     ResourceBundle.getBundle = function( baseName ) {
-        var locale = arguments.length > 1 && arguments[1] ? arguments[1] : global.Locale.getDefault();
+        var locale = arguments.length > 1 && arguments[1] ? arguments[1] : Locale.getDefault();
         var bundle = _cache[ baseName + "-" + locale.toLanguageTag() ];
         if ( bundle ) {
             return bundle;
@@ -60,4 +71,4 @@
 
     return ResourceBundle;
 
-} )();
+} );

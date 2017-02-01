@@ -49,7 +49,7 @@ module.exports = function( grunt ) {
     var resourceFiles = [];
     resourceNames.forEach( function( baseName ) {
         var pattern = resourceDir + baseName + "-*.js";
-        sourceFiles.push( resourceDir + baseName + ".js" );
+        resourceFiles.push( resourceDir + baseName + ".js" );
         resourceFiles = resourceFiles.concat( grunt.file.expandMapping( pattern ).map( function( item ) {
             return item.dest;
         } ) );
@@ -59,7 +59,19 @@ module.exports = function( grunt ) {
 
         pkg: grunt.file.readJSON( "package.json" ),
 
-        clean: [ "dist/" ],
+        clean: {
+            dist: "dist/",
+            lib: "lib/"
+        },
+
+        copy: {
+            main: {
+                expand: true,
+                cwd: "src/",
+                src: "**",
+                dest: "lib/"
+            }
+        },
 
         uglify: {
             options: {
@@ -83,9 +95,10 @@ module.exports = function( grunt ) {
                         "SimpleDateFormat"
                     ]
                 },
+                ASCIIOnly: true,
                 banner: "/*! <%=pkg.name %> | <%= pkg.version %> | <%= grunt.template.today('yyyy-mm-dd') %> */\n"
             },
-            js: {
+            main: {
                 options: {
                     mangle: false,
                     compress: false,
@@ -97,7 +110,7 @@ module.exports = function( grunt ) {
                     "dist/text-resources.js": resourceFiles
                 }
             },
-            all: {
+            dist: {
                 options: {
                     sourceMap: true
                 },
@@ -115,10 +128,11 @@ module.exports = function( grunt ) {
     } );
 
     grunt.loadNpmTasks( "grunt-contrib-clean" );
+    grunt.loadNpmTasks( "grunt-contrib-copy" );
     grunt.loadNpmTasks( "grunt-contrib-uglify" );
     grunt.loadNpmTasks( "grunt-contrib-qunit" );
 
-    grunt.registerTask( "default", [ "clean", "uglify:js", "uglify:all" ] );
+    grunt.registerTask( "default", [ "clean", "copy", "uglify:main", "uglify:dist" ] );
     grunt.registerTask( "test", [ "qunit" ] );
 
 };

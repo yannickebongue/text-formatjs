@@ -1,15 +1,15 @@
-( function() {
-    var global = this;
+( function( global, factory ) {
+
+    if ( typeof module === "object" && typeof module.exports === "object" ) {
+        global.CalendarHelper = module.require( "./calendar-helper" );
+        exports[ "SimpleDateFormat" ] = module.exports = factory( global );
+    } else {
+        factory( global );
+    }
+
+} )( this, function( global ) {
 
     var CalendarHelper = global.CalendarHelper;
-    var DateFormat = global.DateFormat;
-    var DecimalFormat = global.DecimalFormat;
-    var DateFormatSymbols = global.DateFormatSymbols;
-    var FieldPosition = global.FieldPosition;
-    var Locale = global.Locale;
-    var NumberFormat = global.NumberFormat;
-    var ParsePosition = global.ParsePosition;
-    var ResourceBundle = global.ResourceBundle;
 
     function SimpleDateFormat() {
         DateFormat.call( this );
@@ -1301,4 +1301,4 @@
 
     return SimpleDateFormat;
 
-} )();
+} );
