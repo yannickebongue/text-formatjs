@@ -39,22 +39,6 @@ module.exports = function( grunt ) {
         return "src/" + file;
     } );
 
-    var resourceDir = "resources/";
-    var resourceNames = [
-        "currency-names",
-        "format-data",
-        "locale-names"
-    ];
-
-    var resourceFiles = [];
-    resourceNames.forEach( function( baseName ) {
-        var pattern = resourceDir + baseName + "-*.js";
-        resourceFiles.push( resourceDir + baseName + ".js" );
-        resourceFiles = resourceFiles.concat( grunt.file.expandMapping( pattern ).map( function( item ) {
-            return item.dest;
-        } ) );
-    } );
-
     grunt.initConfig( {
 
         pkg: grunt.file.readJSON( "package.json" ),
@@ -70,6 +54,17 @@ module.exports = function( grunt ) {
                 cwd: "src/",
                 src: "**",
                 dest: "lib/"
+            }
+        },
+
+        npmcopy: {
+            external: {
+                options: {
+                    destPrefix: "external/"
+                },
+                files: {
+                    "text-resources": "text-resources/dist/**/*.js"
+                }
             }
         },
 
@@ -107,7 +102,7 @@ module.exports = function( grunt ) {
                 },
                 files: {
                     "dist/text-format.js": sourceFiles,
-                    "dist/text-resources.js": resourceFiles
+                    "dist/text-resources.js": "external/text-resources/text-resources.js"
                 }
             },
             dist: {
@@ -131,6 +126,7 @@ module.exports = function( grunt ) {
     grunt.loadNpmTasks( "grunt-contrib-copy" );
     grunt.loadNpmTasks( "grunt-contrib-uglify" );
     grunt.loadNpmTasks( "grunt-contrib-qunit" );
+    grunt.loadNpmTasks( "grunt-npmcopy" );
 
     grunt.registerTask( "default", [ "clean", "copy", "uglify:main", "uglify:dist" ] );
     grunt.registerTask( "test", [ "qunit" ] );
