@@ -101,7 +101,8 @@ module.exports = function( grunt ) {
                     preserveComments: "all"
                 },
                 files: {
-                    "dist/text-format.js": sourceFiles
+                    "dist/text-format.js": sourceFiles,
+                    "dist/text-resources.js": "external/text-resources/text-resources.js"
                 }
             },
             dist: {
@@ -109,7 +110,8 @@ module.exports = function( grunt ) {
                     sourceMap: true
                 },
                 files: {
-                    "dist/text-format.min.js": "dist/text-format.js"
+                    "dist/text-format.min.js": "dist/text-format.js",
+                    "dist/text-resources.min.js": "dist/text-resources.js"
                 }
             }
         },
