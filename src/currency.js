@@ -2,7 +2,7 @@
 
     if ( typeof module === "object" && typeof module.exports === "object" ) {
         global.CurrencyData = module.require( "./currency-data" );
-        exports.Currency = module.exports = factory( global );
+        exports[ "Currency" ] = module.exports = factory( global );
     } else {
         factory( global );
     }

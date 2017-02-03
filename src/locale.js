@@ -1,7 +1,7 @@
 ( function( global, factory ) {
 
     if ( typeof module === "object" && typeof module.exports === "object" ) {
-        exports.Locale = module.exports = factory( global );
+        exports[ "Locale" ] = module.exports = factory( global );
     } else {
         factory( global );
     }
