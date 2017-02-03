@@ -116,9 +116,9 @@
                             if (i<pattern.length &&
                                 pattern.charAt(i) == _CURRENCY_SIGN) {
                                 ++i;
-                                string = symbols.getInternationalCurrencySymbol();
+                                string = _symbols.getInternationalCurrencySymbol();
                             } else {
-                                string = symbols.getCurrencySymbol();
+                                string = _symbols.getCurrencySymbol();
                             }
                             if (string.length > 0) {
                                 if (positions == null) {
@@ -132,17 +132,17 @@
                             }
                             continue;
                         case _PATTERN_PERCENT:
-                            c = symbols.getPercent();
+                            c = _symbols.getPercent();
                             field = -1;
                             fieldID = NumberFormat.Field.PERCENT;
                             break;
                         case _PATTERN_PER_MILLE:
-                            c = symbols.getPerMill();
+                            c = _symbols.getPerMill();
                             field = -1;
                             fieldID = NumberFormat.Field.PERMILLE;
                             break;
                         case _PATTERN_MINUS:
-                            c = symbols.getMinusSign();
+                            c = _symbols.getMinusSign();
                             field = -1;
                             fieldID = NumberFormat.Field.SIGN;
                             break;
@@ -193,13 +193,13 @@
                     } else if (localized) {
                         switch (c) {
                             case _PATTERN_PERCENT:
-                                c = symbols.getPercent();
+                                c = _symbols.getPercent();
                                 break;
                             case _PATTERN_PER_MILLE:
-                                c = symbols.getPerMill();
+                                c = _symbols.getPerMill();
                                 break;
                             case _PATTERN_MINUS:
-                                c = symbols.getMinusSign();
+                                c = _symbols.getMinusSign();
                                 break;
                         }
                     }
@@ -212,14 +212,14 @@
         var _appendAffix = function( buffer, affix, localized ) {
             var needQuote;
             if (localized) {
-                needQuote = affix.indexOf(symbols.getZeroDigit()) >= 0
-                    || affix.indexOf(symbols.getGroupingSeparator()) >= 0
-                    || affix.indexOf(symbols.getDecimalSeparator()) >= 0
-                    || affix.indexOf(symbols.getPercent()) >= 0
-                    || affix.indexOf(symbols.getPerMill()) >= 0
-                    || affix.indexOf(symbols.getDigit()) >= 0
-                    || affix.indexOf(symbols.getPatternSeparator()) >= 0
-                    || affix.indexOf(symbols.getMinusSign()) >= 0
+                needQuote = affix.indexOf(_symbols.getZeroDigit()) >= 0
+                    || affix.indexOf(_symbols.getGroupingSeparator()) >= 0
+                    || affix.indexOf(_symbols.getDecimalSeparator()) >= 0
+                    || affix.indexOf(_symbols.getPercent()) >= 0
+                    || affix.indexOf(_symbols.getPerMill()) >= 0
+                    || affix.indexOf(_symbols.getDigit()) >= 0
+                    || affix.indexOf(_symbols.getPatternSeparator()) >= 0
+                    || affix.indexOf(_symbols.getMinusSign()) >= 0
                     || affix.indexOf(_CURRENCY_SIGN) >= 0;
             }
             else {
@@ -268,30 +268,30 @@
                 for (i = digitCount; i > 0; --i) {
                     if (i != digitCount && _this.isGroupingUsed() && _groupingSize != 0 &&
                         i % _groupingSize == 0) {
-                        result += (localized ? symbols.getGroupingSeparator() :
+                        result += (localized ? _symbols.getGroupingSeparator() :
                             _PATTERN_GROUPING_SEPARATOR);
                     }
                     result += (i <= _this.getMinimumIntegerDigits()
-                        ? (localized ? symbols.getZeroDigit() : _PATTERN_ZERO_DIGIT)
-                        : (localized ? symbols.getDigit() : _PATTERN_DIGIT));
+                        ? (localized ? _symbols.getZeroDigit() : _PATTERN_ZERO_DIGIT)
+                        : (localized ? _symbols.getDigit() : _PATTERN_DIGIT));
                 }
                 if (_this.getMaximumFractionDigits() > 0 || _decimalSeparatorAlwaysShown)
-                    result += (localized ? symbols.getDecimalSeparator() :
+                    result += (localized ? _symbols.getDecimalSeparator() :
                         _PATTERN_DECIMAL_SEPARATOR);
                 for (i = 0; i < _this.getMaximumFractionDigits(); ++i) {
                     if (i < _this.getMinimumFractionDigits()) {
-                        result += (localized ? symbols.getZeroDigit() :
+                        result += (localized ? _symbols.getZeroDigit() :
                             _PATTERN_ZERO_DIGIT);
                     } else {
-                        result += (localized ? symbols.getDigit() :
+                        result += (localized ? _symbols.getDigit() :
                             _PATTERN_DIGIT);
                     }
                 }
                 if (_useExponentialNotation) {
-                    result += (localized ? symbols.getExponentSeparator() :
+                    result += (localized ? _symbols.getExponentSeparator() :
                         _PATTERN_EXPONENT);
                     for (i=0; i<_minExponentDigits; ++i)
-                        result += (localized ? symbols.getZeroDigit() :
+                        result += (localized ? _symbols.getZeroDigit() :
                             _PATTERN_ZERO_DIGIT);
                 }
                 if (j == 1) {
@@ -303,10 +303,10 @@
                         if ((_negPrefixPattern != null && _posPrefixPattern != null &&
                             _negPrefixPattern === ("'-" + _posPrefixPattern)) ||
                             (_negPrefixPattern == _posPrefixPattern && // n == p == null
-                            _negativePrefix === (symbols.getMinusSign() + _positivePrefix)))
+                            _negativePrefix === (_symbols.getMinusSign() + _positivePrefix)))
                             break;
                     }
-                    result += (localized ? symbols.getPatternSeparator() :
+                    result += (localized ? _symbols.getPatternSeparator() :
                         _PATTERN_SEPARATOR);
                 } else {
                     result = _appendAffixPattern(result, _negSuffixPattern, _negativeSuffix, localized);
@@ -1132,7 +1132,7 @@
                         var stat = [false, false];
                         var exponentDigits = new DigitList();
 
-                        if (_subparse(text, pos, "", symbols.getMinusSign(), exponentDigits, true, stat) &&
+                        if (_subparse(text, pos, "", _symbols.getMinusSign(), exponentDigits, true, stat) &&
                             exponentDigits.fitsIntoLong(stat[_STATUS_POSITIVE], true)) {
                             position = pos.index; // Advance past the exponent
                             exponent = exponentDigits.getLong();
