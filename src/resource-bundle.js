@@ -5,7 +5,7 @@
         global.CurrencyNames = CurrencyNames;
         global.FormatData = FormatData;
         global.LocaleNames = LocaleNames;
-        exports.ResourceBundle = module.exports = factory( global );
+        exports[ "ResourceBundle" ] = module.exports = factory( global );
     } else {
         factory( global );
     }
