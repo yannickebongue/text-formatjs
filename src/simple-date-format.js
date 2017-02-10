@@ -41,6 +41,7 @@
 
         var _initializeCalendar = function( loc ) {
             _date = new Date();
+            CalendarHelper.setCalendarData( loc );
         };
 
         var _initializeDefaultCentury = function() {
@@ -179,9 +180,10 @@
             var field = _PATTERN_INDEX_TO_CALENDAR_FIELD[patternCharIndex];
             var value;
             if (field == 17) {
-                patternCharIndex = DateFormatSymbols.PATTERN_YEAR;
+                value = CalendarHelper.getWeekYear( _date );
+                /*patternCharIndex = DateFormatSymbols.PATTERN_YEAR;
                 field = _PATTERN_INDEX_TO_CALENDAR_FIELD[patternCharIndex];
-                value = CalendarHelper.getField( _date, field );
+                value = CalendarHelper.getField( _date, field );*/
             } else if (field == 1000) {
                 value = CalendarHelper.toISODayOfWeek(CalendarHelper.getField( _date, 7 ));
             } else {
@@ -511,10 +513,10 @@
             var value = 0;
             var pos = new ParsePosition(0);
             pos.index = start;
-            if (patternCharIndex == DateFormatSymbols.PATTERN_WEEK_YEAR) {
+            /*if (patternCharIndex == DateFormatSymbols.PATTERN_WEEK_YEAR) {
                 // use calendar year 'y' instead
                 patternCharIndex = DateFormatSymbols.PATTERN_YEAR;
-            }
+            }*/
             var field = _PATTERN_INDEX_TO_CALENDAR_FIELD[patternCharIndex];
 
             // If there are any spaces here, skip over them.  If we hit the end
