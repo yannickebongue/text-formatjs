@@ -1,4 +1,19 @@
-/*! text-resources | 0.0.3 | 2017-02-01 */
+/*! text-resources | 0.0.5 | 2017-02-10 */
+(function(global, factory) {
+    if (typeof module === "object" && typeof module.exports === "object") {
+        global.CalendarData = module.require("./calendar-data");
+        module.exports = factory(global);
+    } else {
+        factory(global);
+    }
+})(this, function(global) {
+    global.CalendarData["it"] = {
+        firstDayOfWeek: "2",
+        minimalDaysInFirstWeek: "4"
+    };
+    return global.CalendarData;
+});
+
 (function(global, factory) {
     if (typeof module === "object" && typeof module.exports === "object") {
         global.CurrencyNames = module.require("./currency-names");
