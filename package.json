@@ -30,7 +30,7 @@
   },
   "bugs": "https://github.com/yannickebongue/text-formatjs/issues",
   "dependencies": {
-    "text-resources": "0.0.3"
+    "text-resources": "0.0.5"
   },
   "devDependencies": {
     "grunt": "1.0.1",

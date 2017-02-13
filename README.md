@@ -122,15 +122,15 @@ var fileParts = [ "no files", "one file", "{0,number} files" ];
 var fileForm = new ChoiceFormat( fileLimits, fileParts );
 var fileCounts = [ 0, 1, 2, 3, 1273 ];
 form.setFormatByArgumentIndex( 0, fileForm );
-fileCounts.forEach( function( fileCount, i ) {
+fileCounts.forEach( function( fileCount ) {
     form.format( [ fileCount, "MyDisk" ] );
 } );
 
-// -> 'The disk \"MyDisk\" contains no files.'
-// -> 'The disk \"MyDisk\" contains one file.'
-// -> 'The disk \"MyDisk\" contains 2 files.'
-// -> 'The disk \"MyDisk\" contains 3 files.'
-// -> 'The disk \"MyDisk\" contains 1,273 files.'
+// -> 'The disk "MyDisk" contains no files.'
+// -> 'The disk "MyDisk" contains one file.'
+// -> 'The disk "MyDisk" contains 2 files.'
+// -> 'The disk "MyDisk" contains 3 files.'
+// -> 'The disk "MyDisk" contains 1,273 files.'
 ```
 
 ## Learn more
@@ -140,9 +140,6 @@ For further information about how to use the text-formatjs library, see
  - The Java Tutorials > Internationalization > Formatting  
  <http://docs.oracle.com/javase/tutorial/i18n/format/index.html>
  
- - The Java API Specification of the `java.text.Format` class
- <http://docs.oracle.com/javase/7/docs/api/>
-
 ## License
 
 Copyright (c) 2016 Yannick Ebongue
