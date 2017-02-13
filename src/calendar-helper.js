@@ -18,6 +18,12 @@
     var _firstDayOfWeek = 1;
     var _minimalDaysInFirstWeek = 1;
 
+    var _getFirstWeekDate = function( weekYear, month ) {
+        var firstWeekDate = new Date( weekYear, ( !isNaN( month ) ? month : 0 ), _minimalDaysInFirstWeek );
+        firstWeekDate.setDate( firstWeekDate.getDate() - _getWeekdayDelta( firstWeekDate.getDay() ) );
+        return firstWeekDate;
+    };
+
     var _getWeekdayDelta = function( weekday ) {
         return ( ( weekday - ( _firstDayOfWeek - 1 ) + 7 ) % 7 );
     };
@@ -161,25 +167,16 @@
     };
 
     CalendarHelper.getMonthWeekNumber = function( date ) {
-        var firstWeekStartDate = new Date( date.getFullYear(), date.getMonth(), _minimalDaysInFirstWeek );
-        firstWeekStartDate.setDate( firstWeekStartDate.getDate() - _getWeekdayDelta( firstWeekStartDate.getDay() ) );
-        return Math.ceil( ( ( ( date - firstWeekStartDate ) / _ONE_DAY ) + 1 ) / 7 );
+        return Math.ceil( ( ( ( date - _getFirstWeekDate( date.getFullYear(), date.getMonth() ) ) / _ONE_DAY ) + 1 ) / 7 );
     };
 
     CalendarHelper.getWeekNumber = function( date ) {
-        // var d = new Date( date.getTime() );
-        // d.setHours( 0, 0, 0, 0);
-        // d.setDate( d.getDate() + 4 - ( d.getDay() || 7 ) );
-        // return Math.ceil( ( ( ( d - new Date( d.getFullYear(), 0, 1) ) / 86400000 ) + 1 ) / 7 );
-        var firstWeekStartDate = new Date( date.getFullYear(), 0, _minimalDaysInFirstWeek );
-        firstWeekStartDate.setDate( firstWeekStartDate.getDate() - _getWeekdayDelta( firstWeekStartDate.getDay() ) );
-        var weekNr = Math.ceil( ( ( ( date - firstWeekStartDate ) / _ONE_DAY ) + 1 ) / 7 );
-        return weekNr < 1 ? CalendarHelper.getWeekNumber( new Date( date.getFullYear(), 0, 0 ) ) : weekNr;
+        var weekNumber = Math.ceil( ( ( ( date - _getFirstWeekDate( date.getFullYear() ) ) / _ONE_DAY ) + 1 ) / 7 );
+        return weekNumber < 1 ? CalendarHelper.getWeekNumber( new Date( date.getFullYear(), 0, 0 ) ) : weekNumber;
     };
 
     CalendarHelper.getWeekYear = function( date ) {
         var d = new Date( date.getTime() );
-        // d.setDate( d.getDate() - ( ( date.getDay() + 6 ) % 7 ) + 3 );
         d.setDate( d.getDate() - _getWeekdayDelta( d.getDay() ) );
         return d.getFullYear();
     };
@@ -191,8 +188,8 @@
         return Math.floor( ( end - start ) / _ONE_DAY );
     };
 
-    CalendarHelper.computeDateOfWeekOfYear = function( year, weekOfYear, weekday ) {
-        var dayOfYear = ( weekOfYear * 7 ) + ( weekday || 7  ) - ( ( new Date( year, 0, 4 ).getDay() || 7 ) + 3 );
+    CalendarHelper.computeDateOfWeekOfYear = function( year, weekNumber, weekday ) {
+        var dayOfYear =  ( ( weekNumber - 1 ) * 7 ) + _getFirstWeekDate( year ).getDate() + _getWeekdayDelta( weekday );
         var daysInYear = CalendarHelper.computeDayOfYear( new Date( year + 1, 0, 0 ) );
         if ( dayOfYear < 1 ) {
             dayOfYear += CalendarHelper.computeDayOfYear( new Date( year, 0, 0 ) );
@@ -205,9 +202,8 @@
     };
 
     CalendarHelper.computeDateOfWeekOfMonth = function( year, month, weekOfMonth, weekday ) {
-        var d = new Date( year, month, _minimalDaysInFirstWeek );
-        d.setDate( d.getDate() - _getWeekdayDelta( d.getDay() ) );
-        var dayOfMonth = d.getDate() + ( ( weekOfMonth - 1 ) * 7 ) + _getWeekdayDelta( weekday );
+        var d = _getFirstWeekDate( year, month );
+        var dayOfMonth = ( ( weekOfMonth - 1 ) * 7 ) + d.getDate() + _getWeekdayDelta( weekday );
         return new Date( d.getFullYear(), d.getMonth(), dayOfMonth );
     };
 
