@@ -2,6 +2,7 @@
 
     if ( typeof module === "object" && typeof module.exports === "object" ) {
         require( "text-resources" );
+        global.CalendarData = CalendarData;
         global.CurrencyNames = CurrencyNames;
         global.FormatData = FormatData;
         global.LocaleNames = LocaleNames;

@@ -1,4 +1,4 @@
-/*! text-resources | 0.0.3 | 2017-02-01 */
+/*! text-resources | 0.0.5 | 2017-02-10 */
 (function(global, factory) {
     if (typeof module === "object" && typeof module.exports === "object") {
         global.CurrencyNames = module.require("./currency-names");

@@ -10,6 +10,30 @@
 
     function CalendarHelper() {}
 
+    var _ONE_SECOND = 1000;
+    var _ONE_MINUTE = _ONE_SECOND * 60;
+    var _ONE_HOUR   = _ONE_MINUTE * 60;
+    var _ONE_DAY    = _ONE_HOUR * 24;
+
+    var _firstDayOfWeek = 1;
+    var _minimalDaysInFirstWeek = 1;
+
+    var _getFirstWeekDate = function( weekYear, month ) {
+        var firstWeekDate = new Date( weekYear, ( !isNaN( month ) ? month : 0 ), _minimalDaysInFirstWeek );
+        firstWeekDate.setDate( firstWeekDate.getDate() - _getWeekdayDelta( firstWeekDate.getDay() ) );
+        return firstWeekDate;
+    };
+
+    var _getWeekdayDelta = function( weekday ) {
+        return ( ( weekday - ( _firstDayOfWeek - 1 ) + 7 ) % 7 );
+    };
+
+    CalendarHelper.setCalendarData = function( locale ) {
+        var rb = ResourceBundle.getBundle( "CalendarData", locale );
+        _firstDayOfWeek = parseInt( rb[ "firstDayOfWeek" ], 10 );
+        _minimalDaysInFirstWeek = parseInt( rb[ "minimalDaysInFirstWeek" ], 10 );
+    };
+
     CalendarHelper.getField = function( date, field ) {
         switch ( field ) {
         case 0:     // ERA
@@ -19,9 +43,9 @@
         case 2:     // MONTH
             return date.getMonth();
         case 3:     // WEEK_OF_YEAR
-            return null;
+            return CalendarHelper.getWeekNumber( date );
         case 4:     // WEEK_OF_MONTH
-            return null;
+            return CalendarHelper.getMonthWeekNumber( date );
         case 5:     // DATE, DAY_OF_MONTH
             return date.getDate();
         case 6:     // DAY_OF_YEAR
@@ -62,8 +86,10 @@
             date.setMonth( value );
             break;
         case 3:     // WEEK_OF_YEAR
+            date.setTime( CalendarHelper.computeDateOfWeekOfYear( date.getFullYear(), value, date.getDay() ) );
             break;
         case 4:     // WEEK_OF_MONTH
+            date.setTime( CalendarHelper.computeDateOfWeekOfMonth( date.getFullYear(), date.getMonth(), value, date.getDay() ) );
             break;
         case 5:     // DATE, DAY_OF_MONTH
             date.setDate( value );
@@ -140,11 +166,45 @@
         return sb;
     };
 
+    CalendarHelper.getMonthWeekNumber = function( date ) {
+        return Math.ceil( ( ( ( date - _getFirstWeekDate( date.getFullYear(), date.getMonth() ) ) / _ONE_DAY ) + 1 ) / 7 );
+    };
+
+    CalendarHelper.getWeekNumber = function( date ) {
+        var weekNumber = Math.ceil( ( ( ( date - _getFirstWeekDate( date.getFullYear() ) ) / _ONE_DAY ) + 1 ) / 7 );
+        return weekNumber < 1 ? CalendarHelper.getWeekNumber( new Date( date.getFullYear(), 0, 0 ) ) : weekNumber;
+    };
+
+    CalendarHelper.getWeekYear = function( date ) {
+        var d = new Date( date.getTime() );
+        d.setDate( d.getDate() - _getWeekdayDelta( d.getDay() ) );
+        return d.getFullYear();
+    };
+
     CalendarHelper.computeDayOfYear = function( date ) {
         var year = date.getFullYear();
         var start = new Date( year, 0, 0, 0, 0, 0, 0 );
         var end = new Date( year, date.getMonth(), date.getDate(), 0, 0, 0, 0 );
-        return ( end.getTime() - start.getTime() ) / ( 24 * 60 * 60 * 1000 );
+        return Math.floor( ( end - start ) / _ONE_DAY );
+    };
+
+    CalendarHelper.computeDateOfWeekOfYear = function( year, weekNumber, weekday ) {
+        var dayOfYear =  ( ( weekNumber - 1 ) * 7 ) + _getFirstWeekDate( year ).getDate() + _getWeekdayDelta( weekday );
+        var daysInYear = CalendarHelper.computeDayOfYear( new Date( year + 1, 0, 0 ) );
+        if ( dayOfYear < 1 ) {
+            dayOfYear += CalendarHelper.computeDayOfYear( new Date( year, 0, 0 ) );
+            year--;
+        } else if ( dayOfYear > daysInYear ) {
+            dayOfYear -= daysInYear;
+            year++;
+        }
+        return new Date( year, 0, dayOfYear );
+    };
+
+    CalendarHelper.computeDateOfWeekOfMonth = function( year, month, weekOfMonth, weekday ) {
+        var d = _getFirstWeekDate( year, month );
+        var dayOfMonth = ( ( weekOfMonth - 1 ) * 7 ) + d.getDate() + _getWeekdayDelta( weekday );
+        return new Date( d.getFullYear(), d.getMonth(), dayOfMonth );
     };
 
     global.CalendarHelper = CalendarHelper;

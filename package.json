@@ -2,7 +2,7 @@
   "name": "text-formatjs",
   "title": "Text Format JS",
   "description": "A javascript library for formatting locale-sensitive information such as dates, messages and numbers",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "keywords": [
     "text",
@@ -30,7 +30,7 @@
   },
   "bugs": "https://github.com/yannickebongue/text-formatjs/issues",
   "dependencies": {
-    "text-resources": "0.0.3"
+    "text-resources": "0.0.5"
   },
   "devDependencies": {
     "grunt": "1.0.1",
