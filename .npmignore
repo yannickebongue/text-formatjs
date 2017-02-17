@@ -1,8 +1,10 @@
 .idea/
 
+external/
 src/
 test/
 
 
 .gitattributes
+.travis.yml
 Gruntfile.js
