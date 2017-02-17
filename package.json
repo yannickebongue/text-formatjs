@@ -2,7 +2,7 @@
   "name": "text-formatjs",
   "title": "Text Format JS",
   "description": "A javascript library for formatting locale-sensitive information such as dates, messages and numbers",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "index.js",
   "keywords": [
     "text",
