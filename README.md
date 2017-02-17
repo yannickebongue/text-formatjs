@@ -1,6 +1,6 @@
 # Text Format
 
-[![npm Version][npm-badge]][npm]
+[![npm Version][npm-badge]][npm] [![build status][travis-badge]][travis]
 
 `text-formatjs` is a javascript library for formatting locale-sensitive information such as dates, messages and numbers.
 
@@ -149,5 +149,6 @@ Released under the MIT License (see [LICENSE.txt](LICENSE.txt))
 
 [npm]: https://www.npmjs.org/package/text-formatjs
 [npm-badge]: https://img.shields.io/npm/v/text-formatjs.svg?style=flat-square
+[travis]: https://travis-ci.org/yannickebongue/text-formatjs
+[travis-badge]: https://img.shields.io/travis/yannickebongue/text-formatjs.svg
 [text-resources-npm]: https://www.npmjs.org/package/text-resources
-
